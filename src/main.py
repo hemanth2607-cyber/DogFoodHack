@@ -195,6 +195,8 @@ def get_judge_scores(
             "updated_at": r["updated_at"]
         })
 
+    return results
+
 # --- ROLE SWITCHER & LOGIN (BROWSER CONVENIENCE) ---
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request, redirect: str = "/projects", message: Optional[str] = None):
