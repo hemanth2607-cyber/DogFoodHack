@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Judge Scoring Workspace — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-text">
+    <h1>Judge Scoring Workspace</h1>
+    <p>Logged in as: <strong>{{ judge.name }}</strong> ({{ judge.id }}) &bull; Assigned Tracks: 
+      {% for t in judge_tracks %}<span class="badge track-badge">{{ t }}</span>{% endfor %}
+    </p>
+  </div>
+</div>
+
+<div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Track</th>
+        <th>Functionality (40%)</th>
+        <th>Quality (35%)</th>
+        <th>Innovation (25%)</th>
+        <th>Judge Notes</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in scores %}
+        <tr>
+          <td><strong>{{ s.title }}</strong><br><small>{{ s.project_id }}</small></td>
+          <td><span class="track-tag">{{ s.track_name }}</span></td>
+          <td>{{ s.criteria.get('functionality', '-') }} / 5</td>
+          <td>{{ s.criteria.get('quality', '-') }} / 5</td>
+          <td>{{ s.criteria.get('innovation', '-') }} / 5</td>
+          <td><em>"{{ s.comment }}"</em></td>
+          <td><span class="badge badge-complete">Submitted</span></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7">No assigned reviews found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

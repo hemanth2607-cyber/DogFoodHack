@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Project — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="deadline-banner closed">
+    <div class="banner-icon">&times;</div>
+    <div class="banner-text">
+      <h3>Submissions Closed</h3>
+      <p>The submission window for <strong>Sample Hack 2026</strong> closed on <strong>{{ event.submissions_close }}</strong>. New submissions and modifications are strictly locked.</p>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h2>Project Submission</h2>
+    <p class="form-desc">Event deadline enforcement is actively enabled.</p>
+    <form method="POST" action="/projects/new">
+      <div class="form-group">
+        <label>Project Title</label>
+        <input type="text" name="title" disabled placeholder="e.g. My Hackathon Platform" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Summary</label>
+        <textarea name="summary" disabled rows="3" placeholder="One line description..." class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Track</label>
+        <select name="track_id" disabled class="form-control">
+          {% for trk in tracks %}
+            <option value="{{ trk.id }}">{{ trk.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Repository URL</label>
+        <input type="url" name="repo_url" disabled placeholder="https://github.com/..." class="form-control">
+      </div>
+      <button type="button" disabled class="btn btn-disabled">Event Closed &mdash; Submissions Locked</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Public Project Gallery — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-text">
+    <h1>Project Gallery</h1>
+    <p>Browse all submissions for Sample Hack 2026. Explore projects, source repositories, and tracks.</p>
+  </div>
+  <div class="stats-ribbon">
+    <div class="stat-box">
+      <span class="stat-num">{{ projects|length }}</span>
+      <span class="stat-label">Projects</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num">{{ tracks|length }}</span>
+      <span class="stat-label">Tracks</span>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <form method="GET" action="/projects" class="search-form">
+    <input type="text" name="q" value="{{ query or '' }}" placeholder="Search projects by title or team..." class="input-search">
+    <select name="track" class="select-track" onchange="this.form.submit()">
+      <option value="">All Tracks</option>
+      {% for trk in tracks %}
+        <option value="{{ trk.id }}" {% if selected_track == trk.id %}selected{% endif %}>{{ trk.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    {% if query or selected_track %}
+      <a href="/projects" class="btn btn-secondary">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="gallery-grid">
+  {% for p in projects %}
+    <div class="project-card">
+      <div class="card-header">
+        <span class="track-tag">{{ p.track_name }}</span>
+        <span class="team-label">{{ p.team_name }}</span>
+      </div>
+      <h3 class="project-title">{{ p.title }}</h3>
+      <p class="project-summary">{{ p.summary or 'No summary provided.' }}</p>
+      <div class="card-footer">
+        {% if p.repo_url %}
+          <a href="{{ p.repo_url }}" target="_blank" rel="noopener" class="btn-link">View Repo &rarr;</a>
+        {% endif %}
+        <span class="submission-date">{{ p.submitted_at[:10] }}</span>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No projects found matching your search.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

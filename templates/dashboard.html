@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Organizer Live Dashboard — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-text">
+    <h1>Organizer Live Dashboard</h1>
+    <p>Real-time review progress, track standings, and normalized scores.</p>
+  </div>
+  <div>
+    <a href="/api/export.csv" class="btn btn-primary" download="results.csv">Export Results (CSV)</a>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-title">Total Submissions</span>
+    <span class="stat-val">{{ stats.total_projects }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-title">Active Judges</span>
+    <span class="stat-val">{{ stats.total_judges }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-title">Reviews Submitted</span>
+    <span class="stat-val">{{ stats.total_scores }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-title">Normalization Model</span>
+    <span class="stat-val">Z-Score + Prior</span>
+  </div>
+</div>
+
+<h2>Current Standings (Cross-Judge Normalized)</h2>
+<div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Project Title</th>
+        <th>Track</th>
+        <th>Reviews</th>
+        <th>Raw Avg</th>
+        <th>Normalized Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in leaderboard[:20] %}
+        <tr>
+          <td><span class="rank-pill">#{{ r.rank }}</span></td>
+          <td><strong>{{ r.title }}</strong></td>
+          <td><span class="track-tag">{{ r.track_name }}</span></td>
+          <td>{{ r.review_count }}</td>
+          <td>{{ r.raw_score_avg }}</td>
+          <td><strong class="score-highlight">{{ r.normalized_score }}</strong></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
