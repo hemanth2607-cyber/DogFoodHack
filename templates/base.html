@@ -21,10 +21,11 @@
       </nav>
       <div class="user-pill">
         {% if user %}
-          <span class="badge role-{{ user.role }}">{{ user.role|upper }}</span>
+          <a href="/login" class="badge role-{{ user.role }}" title="Click to switch role">{{ user.role|upper }}</a>
           <span class="username">{{ user.name }}</span>
+          <a href="/logout" class="nav-item logout-link" style="margin-left: 0.5rem; font-size: 0.8rem; color: #ef4444;">Logout</a>
         {% else %}
-          <span class="badge role-visitor">VISITOR</span>
+          <a href="/login" class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">Switch Role / Sign In</a>
         {% endif %}
       </div>
     </div>

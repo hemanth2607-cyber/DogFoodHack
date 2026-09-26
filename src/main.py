@@ -195,10 +195,54 @@ def get_judge_scores(
             "updated_at": r["updated_at"]
         })
 
-    return results
+# --- ROLE SWITCHER & LOGIN (BROWSER CONVENIENCE) ---
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request, redirect: str = "/projects", message: Optional[str] = None):
+    current_user = get_current_user_optional(request)
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={
+            "user": current_user,
+            "redirect_url": redirect,
+            "message": message
+        }
+    )
+
+@app.get("/login/switch")
+def switch_role(role: str = "organizer", redirect: str = "/projects"):
+    role_token_map = {
+        "organizer": "org_7f2a",
+        "judge_a": "jdg_a_91bc",
+        "judge_b": "jdg_b_44de",
+        "participant": "prt_2e88"
+    }
+    token = role_token_map.get(role, "org_7f2a")
+    target_url = redirect if redirect and redirect.startswith("/") else "/projects"
+    if target_url == "/projects":
+        if role == "organizer":
+            target_url = "/organizer"
+        elif role in ("judge_a", "judge_b"):
+            target_url = "/judge"
+
+    response = RedirectResponse(url=target_url, status_code=status.HTTP_302_FOUND)
+    response.set_cookie(key="session", value=token, path="/", httponly=False)
+    return response
+
+@app.get("/logout")
+def logout():
+    response = RedirectResponse(url="/projects", status_code=status.HTTP_302_FOUND)
+    response.delete_cookie(key="session", path="/")
+    return response
 
 @app.get("/judge", response_class=HTMLResponse)
-def judge_ui(request: Request, current_user: AuthUser = Depends(require_judge)):
+def judge_ui(request: Request):
+    current_user = get_current_user_optional(request)
+    if not current_user or not current_user.is_judge():
+        return RedirectResponse(
+            url="/login?redirect=/judge&message=Please+select+Judge+A+or+Judge+B+to+access+scoring.",
+            status_code=status.HTTP_302_FOUND
+        )
     with get_db() as conn:
         judge_tracks = [r["track_id"] for r in conn.execute("SELECT track_id FROM judge_tracks WHERE judge_id = ?", (current_user.id,)).fetchall()]
         scores_data = get_judge_scores(request=request, current_user=current_user)
@@ -215,7 +259,13 @@ def judge_ui(request: Request, current_user: AuthUser = Depends(require_judge)):
 
 # --- T2: ORGANIZER DASHBOARD & CSV EXPORT ---
 @app.get("/organizer", response_class=HTMLResponse)
-def organizer_dashboard(request: Request, current_user: AuthUser = Depends(require_organizer)):
+def organizer_dashboard(request: Request):
+    current_user = get_current_user_optional(request)
+    if not current_user or not current_user.is_organizer():
+        return RedirectResponse(
+            url="/login?redirect=/organizer&message=Please+select+Lead+Organizer+to+view+the+dashboard.",
+            status_code=status.HTTP_302_FOUND
+        )
     with get_db() as conn:
         total_projects = conn.execute("SELECT COUNT(*) as c FROM projects").fetchone()["c"]
         total_judges = conn.execute("SELECT COUNT(*) as c FROM users WHERE role = 'judge'").fetchone()["c"]

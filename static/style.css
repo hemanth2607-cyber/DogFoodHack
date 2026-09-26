@@ -326,3 +326,96 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+.login-wrapper {
+  max-width: 680px;
+  margin: 3rem auto;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2.5rem;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h2 {
+  font-size: 1.75rem;
+  margin-top: 0.75rem;
+}
+
+.login-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.role-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.role-card:hover {
+  transform: translateX(4px);
+  border-color: var(--primary);
+  background: #27354a;
+}
+
+.role-icon {
+  font-size: 2rem;
+}
+
+.role-info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.role-token {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: #090d16;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  color: #38bdf8;
+  display: inline-block;
+  margin: 0.25rem 0;
+}
+
+.role-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.login-footer {
+  text-align: center;
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  color: #93c5fd;
+  font-size: 0.9rem;
+}
+

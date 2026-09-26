@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In &amp; Role Switcher — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="logo-badge">DOGFOOD</span>
+      <h2>Portal Role Switcher</h2>
+      <p>Select a test persona or log in to access role-restricted portals.</p>
+    </div>
+
+    {% if message %}
+      <div class="alert-info">{{ message }}</div>
+    {% endif %}
+
+    <div class="role-grid">
+      <a href="/login/switch?role=organizer&redirect={{ redirect_url }}" class="role-card role-org">
+        <div class="role-icon">&#128081;</div>
+        <div class="role-info">
+          <h3>Lead Organizer</h3>
+          <span class="role-token">Cookie: session=org_7f2a</span>
+          <p>Access live progress dashboard, rubric configuration, and normalized CSV export.</p>
+        </div>
+      </a>
+
+      <a href="/login/switch?role=judge_a&redirect={{ redirect_url }}" class="role-card role-jdg">
+        <div class="role-icon">&#9878;&#65039;</div>
+        <div class="role-info">
+          <h3>Judge A (Tomas Varga)</h3>
+          <span class="role-token">Cookie: session=jdg_a_91bc</span>
+          <p>Score assigned projects, adjust criteria sliders, and submit feedback.</p>
+        </div>
+      </a>
+
+      <a href="/login/switch?role=judge_b&redirect={{ redirect_url }}" class="role-card role-jdg">
+        <div class="role-icon">&#9878;&#65039;</div>
+        <div class="role-info">
+          <h3>Judge B (Reviewer 2)</h3>
+          <span class="role-token">Cookie: session=jdg_b_44de</span>
+          <p>Independent judge account to test peer score isolation defense.</p>
+        </div>
+      </a>
+
+      <a href="/login/switch?role=participant&redirect={{ redirect_url }}" class="role-card role-prt">
+        <div class="role-icon">&#128187;</div>
+        <div class="role-info">
+          <h3>Participant Hacker</h3>
+          <span class="role-token">Cookie: session=prt_2e88</span>
+          <p>Submit projects and manage team memberships (enforces deadline locks).</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="login-footer">
+      <a href="/logout" class="btn btn-secondary">Clear Session (Browse as Public Visitor)</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
