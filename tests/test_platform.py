@@ -46,3 +46,42 @@ def test_normalization_engine():
     top = leaderboard[0]
     assert "normalized_score" in top
     assert 1.0 <= top["normalized_score"] <= 5.0
+
+def test_judge_submit_score():
+    res = client.post(
+        "/api/judge/scores",
+        headers={"Cookie": "session=jdg_a_91bc"},
+        json={
+            "project_id": "prj_01",
+            "functionality": 4.5,
+            "quality": 4.0,
+            "innovation": 4.8,
+            "comment": "Outstanding offline architecture."
+        }
+    )
+    assert res.status_code == 200
+    assert res.json()["status"] == "success"
+
+def test_participant_blocked_from_submitting_score():
+    res = client.post(
+        "/api/judge/scores",
+        headers={"Cookie": "session=prt_2e88"},
+        json={
+            "project_id": "prj_01",
+            "functionality": 4.5,
+            "quality": 4.0,
+            "innovation": 4.8
+        }
+    )
+    assert res.status_code in (401, 403)
+
+def test_ai_rubric_copilot():
+    res = client.get(
+        "/api/judge/ai-suggest?project_id=prj_01",
+        headers={"Cookie": "session=jdg_a_91bc"}
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "suggested_criteria" in data
+    assert 1.0 <= data["suggested_criteria"]["functionality"] <= 5.0
+
