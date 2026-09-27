@@ -98,6 +98,14 @@ def init_db():
             weight REAL NOT NULL DEFAULT 1.0
         );
 
+        CREATE TABLE IF NOT EXISTS community_votes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            voter_token TEXT NOT NULL UNIQUE,
+            project_id TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now', 'utc')),
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
         INSERT OR IGNORE INTO rubric_weights (criterion, weight) VALUES
             ('functionality', 0.40),
             ('quality', 0.35),

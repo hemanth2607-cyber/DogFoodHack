@@ -27,7 +27,7 @@
     </div>
     <div>
       <strong>Submissions are closed</strong>
-      <span>Judging is underway. Explore every project and inspect technical details below.</span>
+      <span>Judging is underway. Click any project card below to inspect full technical architecture and cast a community ballot.</span>
     </div>
     <span class="badge badge-green">{{ projects|length }} projects received</span>
   </div>
@@ -72,7 +72,7 @@
   <div class="gallery-grid" id="project-grid">
     {% for p in projects %}
       {% set accent_color = ['coral', 'sage', 'violet', 'peach', 'blue', 'yellow', 'mint', 'lavender'][loop.index0 % 8] %}
-      <article class="project-card" data-title="{{ p.title|lower }}" data-summary="{{ (p.summary or '')|lower }}" data-track="{{ p.track_name|lower }}" data-team="{{ (p.team_name or '')|lower }}">
+      <article class="project-card" style="cursor: pointer;" onclick="openProjectModal('{{ p.id }}')" data-title="{{ p.title|lower }}" data-summary="{{ (p.summary or '')|lower }}" data-track="{{ p.track_name|lower }}" data-team="{{ (p.team_name or '')|lower }}">
         <div class="project-art art-{{ accent_color }}">
           <span>{{ p.title[:2]|upper }}</span>
           <div class="art-lines"></div>
@@ -99,13 +99,9 @@
 
           <div class="project-foot">
             <span>{{ p.created_at[:10] if p.created_at else "Oct 2026" }}</span>
-            {% if p.repo_url %}
-              <a href="{{ p.repo_url }}" target="_blank" rel="noopener" aria-label="Open {{ p.title }} repository">
-                Repo ↗
-              </a>
-            {% else %}
-              <span style="color: var(--muted); font-size: 0.75rem;">Verified local</span>
-            {% endif %}
+            <span class="text-action" style="margin: 0; padding: 0; border: 0; display: inline-flex; width: auto; color: var(--coral);">
+              Inspect details ↗
+            </span>
           </div>
         </div>
       </article>
@@ -119,8 +115,82 @@
   </div>
 </div>
 
+<!-- Project Deep-Dive Modal & Duplicate-Proof Community Ballot -->
+<div id="project-detail-backdrop" class="modal-backdrop" style="display: none;" onclick="closeProjectModalOnBackdrop(event)">
+  <div class="review-modal" style="max-width: 680px; background: white;">
+    <div class="modal-top">
+      <div>
+        <p class="kicker">PROJECT DOSSIER / <span id="modal-project-track"></span></p>
+        <h2 id="modal-project-title"></h2>
+        <p id="modal-project-team" style="font-weight: 600; color: var(--ink); margin-top: 4px;"></p>
+      </div>
+      <button onclick="closeProjectModal()" aria-label="Close" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--muted);">✕</button>
+    </div>
+
+    <div style="padding: 24px 30px; display: flex; flex-direction: column; gap: 20px;">
+      <!-- Summary / Scope -->
+      <div>
+        <span class="muted-label" style="display: block; margin-bottom: 6px;">PROBLEM STATEMENT &amp; ARCHITECTURE</span>
+        <p id="modal-project-summary" style="font-size: 14px; line-height: 1.6; color: var(--ink); margin: 0;"></p>
+      </div>
+
+      <!-- Team Members -->
+      <div>
+        <span class="muted-label" style="display: block; margin-bottom: 6px;">TEAM CONTRIBUTORS</span>
+        <div id="modal-project-members" style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted);">
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div id="modal-project-repo-wrap" style="display: none;">
+        <span class="muted-label" style="display: block; margin-bottom: 6px;">SOURCE CODE REPOSITORY</span>
+        <a id="modal-project-repo" href="#" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--coral);">
+          🔗 View Repository on GitHub ↗
+        </a>
+      </div>
+
+      <!-- Duplicate-Proof Community Ballot Enclave -->
+      <div style="background: #f7f8f5; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="kicker" style="margin: 0; color: var(--coral);">PEOPLE'S CHOICE BALLOT</span>
+          <span class="badge badge-neutral" id="modal-project-votes-badge">0 Votes</span>
+        </div>
+        <p style="font-size: 12px; color: var(--muted); margin: 0 0 14px; line-height: 1.5;">
+          Cast your community vote for this submission. Strict cryptographic token protection guarantees exactly <strong>one vote per voter</strong>. Duplicate ballots are immediately rejected.
+        </p>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button id="modal-vote-btn" class="btn btn-primary dark-button" onclick="submitCommunityVote()" style="padding: 10px 18px; font-size: 12px;">
+            🗳️ Cast Community Vote
+          </button>
+          <span id="modal-vote-status-text" style="font-size: 12px; font-weight: 600;"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="padding: 16px 30px;">
+      <button class="btn btn-secondary outline-button" onclick="closeProjectModal()">Close Dossier</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let currentTrack = 'all';
+let activeDetailProjectId = null;
+let userVoteState = { has_voted: false, voted_project_id: null };
+
+// Fetch voting status upon loading
+async function checkVoteStatus() {
+  try {
+    const res = await fetch('/api/community/status');
+    if (res.ok) {
+      userVoteState = await res.json();
+    }
+  } catch (e) {
+    console.error('Failed to query voting status', e);
+  }
+}
+checkVoteStatus();
 
 function setTrackFilter(trackName, btn) {
   currentTrack = trackName;
@@ -162,6 +232,128 @@ function filterCards() {
   const countElem = document.getElementById('visible-count');
   if (countElem) countElem.innerText = visibleCount;
   document.getElementById('no-results-msg').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+async function openProjectModal(projectId) {
+  activeDetailProjectId = projectId;
+  const modal = document.getElementById('project-detail-backdrop');
+  modal.style.display = 'grid';
+
+  try {
+    const res = await fetch(`/api/projects/${projectId}`);
+    if (!res.ok) throw new Error('Failed to load project details');
+    const data = await res.json();
+
+    document.getElementById('modal-project-title').textContent = data.title;
+    document.getElementById('modal-project-track').textContent = data.track_name.toUpperCase();
+    document.getElementById('modal-project-team').textContent = 'Team: ' + data.team_name;
+    document.getElementById('modal-project-summary').textContent = data.summary;
+    document.getElementById('modal-project-votes-badge').textContent = `${data.community_votes} Community Votes`;
+
+    // Members
+    const memContainer = document.getElementById('modal-project-members');
+    memContainer.innerHTML = '';
+    if (data.members && data.members.length > 0) {
+      data.members.forEach(m => {
+        const span = document.createElement('span');
+        span.className = 'badge badge-neutral';
+        span.textContent = '👤 ' + m;
+        memContainer.appendChild(span);
+      });
+    } else {
+      memContainer.innerHTML = '<span style="color: var(--muted);">Open collaboration / Solo participant</span>';
+    }
+
+    // Repo URL
+    const repoWrap = document.getElementById('modal-project-repo-wrap');
+    const repoLink = document.getElementById('modal-project-repo');
+    if (data.repo_url) {
+      repoLink.href = data.repo_url;
+      repoLink.textContent = `🔗 ${data.repo_url} ↗`;
+      repoWrap.style.display = 'block';
+    } else {
+      repoWrap.style.display = 'none';
+    }
+
+    // Update Voting Button State
+    updateVoteButtonUI();
+
+  } catch (err) {
+    alert(err.message);
+    closeProjectModal();
+  }
+}
+
+function updateVoteButtonUI() {
+  const btn = document.getElementById('modal-vote-btn');
+  const statusText = document.getElementById('modal-vote-status-text');
+
+  if (userVoteState.has_voted) {
+    btn.disabled = true;
+    if (userVoteState.voted_project_id === activeDetailProjectId) {
+      btn.textContent = '✓ Your Ballot is Cast for This Project';
+      btn.style.background = '#478651';
+      statusText.textContent = 'Ballot verified';
+      statusText.style.color = '#478651';
+    } else {
+      btn.textContent = 'Ballot Already Cast (1 Vote Limit)';
+      btn.style.background = '#8a948e';
+      statusText.textContent = `You voted for project ${userVoteState.voted_project_id}`;
+      statusText.style.color = 'var(--muted)';
+    }
+  } else {
+    btn.disabled = false;
+    btn.textContent = '🗳️ Cast Community Vote';
+    btn.style.background = 'var(--ink)';
+    statusText.textContent = '1 vote per voter enforced';
+    statusText.style.color = 'var(--muted)';
+  }
+}
+
+async function submitCommunityVote() {
+  if (!activeDetailProjectId) return;
+  const btn = document.getElementById('modal-vote-btn');
+  const statusText = document.getElementById('modal-vote-status-text');
+
+  btn.disabled = true;
+  btn.textContent = 'Registering ballot...';
+
+  try {
+    const res = await fetch('/api/community/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_id: activeDetailProjectId })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      // Duplicate rejection or error
+      throw new Error(data.detail || 'Voting failed');
+    }
+
+    // Success! Update voter state
+    userVoteState.has_voted = true;
+    userVoteState.voted_project_id = activeDetailProjectId;
+    updateVoteButtonUI();
+    statusText.textContent = '✓ Vote officially recorded!';
+    statusText.style.color = '#478651';
+
+  } catch (err) {
+    alert(err.message);
+    await checkVoteStatus();
+    updateVoteButtonUI();
+  }
+}
+
+function closeProjectModal() {
+  document.getElementById('project-detail-backdrop').style.display = 'none';
+  activeDetailProjectId = null;
+}
+
+function closeProjectModalOnBackdrop(e) {
+  if (e.target.id === 'project-detail-backdrop') {
+    closeProjectModal();
+  }
 }
 </script>
 {% endblock %}

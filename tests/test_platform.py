@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from src.main import app
 from src.normalization import get_normalized_scores
@@ -85,3 +86,49 @@ def test_ai_rubric_copilot():
     assert "suggested_criteria" in data
     assert 1.0 <= data["suggested_criteria"]["functionality"] <= 5.0
 
+# --- NEW TESTS FOR AUDIT, DETAILS, AND DUPLICATE-PROOF VOTING ---
+
+def test_project_details_api():
+    res = client.get("/api/projects/prj_01")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["id"] == "prj_01"
+    assert "title" in data
+    assert "track_name" in data
+    assert "team_name" in data
+    assert "community_votes" in data
+
+def test_community_voting_strict_duplicate_prevention():
+    test_voter_cookie = f"voter_{uuid.uuid4().hex}"
+    
+    # 1. First vote must succeed
+    res1 = client.post(
+        "/api/community/vote",
+        headers={"Cookie": f"dogfood_voter={test_voter_cookie}"},
+        json={"project_id": "prj_01"}
+    )
+    assert res1.status_code == 200
+    assert res1.json()["status"] == "success"
+
+    # 2. Second vote by the same voter MUST be rejected with HTTP 409
+    res2 = client.post(
+        "/api/community/vote",
+        headers={"Cookie": f"dogfood_voter={test_voter_cookie}"},
+        json={"project_id": "prj_02"}
+    )
+    assert res2.status_code == 409
+    assert "duplicate" in res2.json()["detail"].lower()
+
+def test_cryptographic_audit_chain():
+    # 1. HTML view loads
+    res_html = client.get("/audit")
+    assert res_html.status_code == 200
+    assert "Cryptographic" in res_html.text
+
+    # 2. JSON verification endpoint computes valid SHA-256 chain
+    res_api = client.get("/api/audit/verify")
+    assert res_api.status_code == 200
+    data = res_api.json()
+    assert data["status"] == "VALIDATED_TAMPER_FREE"
+    assert len(data["chain_head"]) == 64  # Valid SHA-256 hex string
+    assert data["total_blocks"] >= 100

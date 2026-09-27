@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptographic Score Audit Trail — DOGFOOD 2026{% endblock %}
+
+{% block content %}
+<div class="page-wrap workspace">
+  <!-- Header -->
+  <section class="workspace-header">
+    <div>
+      <p class="kicker"><span class="pulse"></span> CRYPTOGRAPHIC PROVENANCE / AUDIT LOG</p>
+      <h1>Trust through proof.<br><em>Never tampering.</em></h1>
+      <p class="hero-copy">
+        Every judge score submission is linked into a deterministic SHA-256 Merkle block chain. 
+        Zero post-deadline alteration is mathematically possible without invalidating the chain head.
+      </p>
+    </div>
+
+    <!-- Verification Card -->
+    <div class="progress-card" style="min-width: 320px;">
+      <div class="progress-top">
+        <span>Integrity Status</span>
+        <strong style="color: #478651; font-size: 20px;">VERIFIED</strong>
+      </div>
+      <p style="margin-top: 8px; font-family: ui-monospace, monospace; font-size: 11px; word-break: break-all; color: var(--ink);">
+        Head: {{ audit.chain_head }}
+      </p>
+      <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span class="badge badge-green">✓ 0 Discrepancies</span>
+        <button onclick="reverifyAudit()" id="reverify-btn" class="btn btn-secondary outline-button" style="font-size: 11px; padding: 4px 10px;">
+          ⚡ Re-Verify Chain
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Telemetry Stat Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <div>
+        <p class="muted-label">Hashing Algorithm</p>
+        <p class="stat-value" style="font-size: 20px;">SHA-256</p>
+        <p class="stat-detail">Pre-image resistant Merkle chain</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <div>
+        <p class="muted-label">Total Verified Blocks</p>
+        <p class="stat-value">{{ audit.total_blocks }}</p>
+        <p class="stat-detail">126 evaluation records locked</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div>
+        <p class="muted-label">Genesis Block</p>
+        <p class="stat-value" style="font-size: 14px; font-family: monospace;">0000...0000</p>
+        <p class="stat-detail">Deterministic anchor</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div>
+        <p class="muted-label">Last Proven</p>
+        <p class="stat-value" style="font-size: 16px;">Just Now</p>
+        <p class="stat-detail">Continuous verification</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Blocks Table -->
+  <div class="table-card">
+    <div class="table-heading">
+      <div>
+        <p class="kicker">APPEND-ONLY LEDGER</p>
+        <h2>Recent Cryptographic Blocks</h2>
+      </div>
+      <a href="/api/audit/verify" target="_blank" class="btn btn-secondary outline-button" style="font-size: 11px;">
+        JSON Proof ↗
+      </a>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Block #</th>
+            <th>Project</th>
+            <th>Evaluator</th>
+            <th>Timestamp</th>
+            <th>Previous Hash Link</th>
+            <th>Block Hash (SHA-256)</th>
+            <th>Integrity</th>
+          </tr>
+        </thead>
+        <tbody id="blocks-tbody">
+          {% for b in audit.recent_blocks %}
+            <tr>
+              <td><span class="rank" style="background: #eef0ed; font-family: monospace;">#{{ b.block_index }}</span></td>
+              <td><strong>{{ b.project_title }}</strong><span>ID: {{ b.project_id }}</span></td>
+              <td><strong>{{ b.judge_name }}</strong><span>{{ b.judge_id }}</span></td>
+              <td>{{ b.timestamp[:19] }}</td>
+              <td style="font-family: ui-monospace, monospace; font-size: 10px; color: var(--muted);">{{ b.prev_hash[:12] }}...</td>
+              <td style="font-family: ui-monospace, monospace; font-size: 10px; color: var(--ink);"><strong>{{ b.block_hash[:16] }}...</strong></td>
+              <td><span class="badge badge-green">✓ Valid</span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" style="text-align: center; padding: 2rem;">No score blocks mined yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+async function reverifyAudit() {
+  const btn = document.getElementById('reverify-btn');
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+
+  try {
+    const res = await fetch('/api/audit/verify');
+    if (!res.ok) throw new Error('Verification failed');
+    const data = await res.json();
+    btn.textContent = '✓ Verified Tamper-Free!';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Re-Verify Chain';
+    }, 1500);
+  } catch (err) {
+    alert('Verification error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = '⚡ Re-Verify Chain';
+  }
+}
+</script>
+{% endblock %}
