@@ -7,42 +7,120 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="/projects" class="brand">
-        <span class="logo-badge">DOGFOOD</span>
-        <span class="brand-sub">Judge Engine</span>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/projects" aria-label="DOGFOOD home">
+        <span class="brand-mark">D</span>
+        <span>DOGFOOD</span>
       </a>
+
       <nav class="nav-links">
-        <a href="/projects" class="nav-item">Gallery</a>
-        <a href="/projects/new" class="nav-item">Submit</a>
+        <a href="/projects">Gallery</a>
+        <a href="/projects/new">Submit</a>
         {% if user and user.is_judge() %}
-          <a href="/judge" class="nav-item" style="color: #38bdf8; font-weight: 600;">⭐ Scoring Workspace</a>
+          <a href="/judge" style="color: var(--ink); font-weight: 700;">Judge Workspace</a>
         {% elif user and user.is_organizer() %}
-          <a href="/organizer" class="nav-item" style="color: #fbbf24; font-weight: 600;">👑 Organizer Command Center</a>
+          <a href="/organizer" style="color: var(--ink); font-weight: 700;">Command Center</a>
         {% endif %}
       </nav>
-      <div class="user-pill">
+
+      <div class="topbar-actions">
+        <div class="role-indicator">
+          <span class="status-dot"></span>
+          {% if user %}
+            <span>{{ user.role|capitalize }}</span>
+            <span class="role-name">· {{ user.name }}</span>
+          {% else %}
+            <span>Guest</span>
+            <span class="role-name">· Public view</span>
+          {% endif %}
+        </div>
+        <button class="role-switch" type="button" onclick="openPersonaModal()">
+          Switch persona ▾
+        </button>
         {% if user %}
-          <span class="badge role-{{ user.role }}">{{ user.role|upper }}</span>
-          <span class="username" style="font-weight: 500;">{{ user.name }}</span>
-          <a href="/login" class="nav-item" style="margin-left: 0.6rem; font-size: 0.8rem; color: #94a3b8;" title="Switch demo persona">Switch Persona</a>
-          <a href="/logout" class="nav-item logout-link" style="margin-left: 0.4rem; font-size: 0.8rem; color: #ef4444;">Logout</a>
-        {% else %}
-          <a href="/login" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">Sign In / Switch Persona</a>
+          <a href="/logout" class="icon-button" style="color: #b94e3b; text-decoration: none; padding: 4px 8px; font-weight: 700;" title="Sign out">✕</a>
         {% endif %}
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="main-content">
-    {% block content %}{% endblock %}
-  </main>
+    <main id="top">
+      {% block content %}{% endblock %}
+    </main>
 
-  <footer class="footer">
-    <div class="footer-container">
+    <footer class="footer">
       <p>DOGFOOD 2026 &bull; Build the platform that will judge you &bull; Open Source, Zero Cloud</p>
+    </footer>
+  </div>
+
+  <!-- Global Persona Switcher Modal -->
+  <div id="persona-modal-backdrop" class="modal-backdrop" style="display: none;" onclick="closePersonaOnBackdrop(event)">
+    <div class="role-modal">
+      <div class="modal-top">
+        <div>
+          <p class="kicker">DEMO GATEWAY</p>
+          <h2>Switch persona</h2>
+          <p>Experience DOGFOOD through each isolated role lens.</p>
+        </div>
+        <button onclick="closePersonaModal()" aria-label="Close" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--muted);">✕</button>
+      </div>
+      <div class="role-list">
+        <a href="/login/switch?role=organizer" class="role-option">
+          <span class="role-option-icon">👑</span>
+          <span>
+            <strong>Lead Organizer</strong>
+            <small>Full event command center &amp; CSV export</small>
+          </span>
+          <span style="font-size: 12px; font-weight: 800; color: var(--coral);">Enter ↗</span>
+        </a>
+        <a href="/login/switch?role=judge_a" class="role-option">
+          <span class="role-option-icon">⚖️</span>
+          <span>
+            <strong>Judge A · Tomas Varga</strong>
+            <small>Accessibility track · Private score enclave &amp; AI co-pilot</small>
+          </span>
+          <span style="font-size: 12px; font-weight: 800; color: var(--coral);">Enter ↗</span>
+        </a>
+        <a href="/login/switch?role=judge_b" class="role-option">
+          <span class="role-option-icon">🛡️</span>
+          <span>
+            <strong>Judge B · Wei Lindqvist</strong>
+            <small>Peer reviewer · Strict 403 peer isolation</small>
+          </span>
+          <span style="font-size: 12px; font-weight: 800; color: var(--coral);">Enter ↗</span>
+        </a>
+        <a href="/login/switch?role=participant" class="role-option">
+          <span class="role-option-icon">💻</span>
+          <span>
+            <strong>Participant Hacker</strong>
+            <small>Open Door Labs · Submissions locked</small>
+          </span>
+          <span style="font-size: 12px; font-weight: 800; color: var(--coral);">Enter ↗</span>
+        </a>
+        <a href="/logout" class="role-option" style="border-top: 1px dashed var(--line); margin-top: 4px; padding-top: 12px;">
+          <span class="role-option-icon">🌐</span>
+          <span>
+            <strong>Public Guest</strong>
+            <small>Explore open submission gallery unauthenticated</small>
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--muted);">Browse ↗</span>
+        </a>
+      </div>
     </div>
-  </footer>
+  </div>
+
+  <script>
+  function openPersonaModal() {
+    document.getElementById('persona-modal-backdrop').style.display = 'grid';
+  }
+  function closePersonaModal() {
+    document.getElementById('persona-modal-backdrop').style.display = 'none';
+  }
+  function closePersonaOnBackdrop(e) {
+    if (e.target.id === 'persona-modal-backdrop') {
+      closePersonaModal();
+    }
+  }
+  </script>
 </body>
 </html>

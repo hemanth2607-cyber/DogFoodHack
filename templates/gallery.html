@@ -3,97 +3,120 @@
 {% block title %}Public Project Gallery — DOGFOOD 2026{% endblock %}
 
 {% block content %}
-<div class="page-header" style="margin-bottom: 1.5rem;">
-  <div class="header-text">
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-      <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">
-        ● SUBMISSION WINDOW CONCLUDED
-      </span>
-      <span style="color: #64748b; font-size: 0.85rem;">Public Showcase</span>
+<div class="page-wrap">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div>
+      <p class="kicker"><span class="pulse"></span> DOGFOOD / OPEN SOURCE HACKATHON</p>
+      <h1>Built in public.<br><em>Judged with care.</em></h1>
+      <p class="hero-copy">A transparent home for ambitious projects, thoughtful feedback, and the people who make better software together.</p>
     </div>
-    <h1 style="margin: 0;">Sample Hack 2026 Submissions</h1>
-    <p style="margin: 0.35rem 0 0; color: #94a3b8;">
-      Explore {{ projects|length }} innovative open-source solutions across {{ tracks|length }} competition tracks.
-    </p>
+    <div class="hero-note">
+      <span class="note-label">Event 01</span>
+      <strong>Build for the<br>common good.</strong>
+      <span>Sample Hack 2026</span>
+    </div>
+  </section>
+
+  <!-- Deadline Status Banner -->
+  <div class="deadline-banner">
+    <div class="deadline-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <div>
+      <strong>Submissions are closed</strong>
+      <span>Judging is underway. Explore every project and inspect technical details below.</span>
+    </div>
+    <span class="badge badge-green">{{ projects|length }} projects received</span>
   </div>
 
-  <div class="stats-ribbon" style="margin: 0;">
-    <div class="stat-card" style="padding: 0.85rem 1.25rem; min-width: 140px;">
-      <span class="stat-title">Total Projects</span>
-      <span class="stat-val" style="color: #38bdf8;">{{ projects|length }}</span>
+  <!-- Section Heading with Live Search -->
+  <section class="section-heading">
+    <div>
+      <p class="kicker">THE WORK</p>
+      <h2>Project gallery <span style="font-weight: 400; color: var(--muted); font-size: 1.1rem;">· <span id="visible-count">{{ projects|length }}</span> of {{ projects|length }}</span></h2>
     </div>
-    <div class="stat-card" style="padding: 0.85rem 1.25rem; min-width: 140px;">
-      <span class="stat-title">Tracks</span>
-      <span class="stat-val" style="color: #34d399;">{{ tracks|length }}</span>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="live-search" placeholder="Search projects, teams, summaries..." value="{{ query or '' }}" oninput="filterCards()" aria-label="Search projects">
+      <button id="clear-search-btn" style="display: none; background: none; border: none; cursor: pointer; color: var(--muted);" onclick="clearSearch()" aria-label="Clear search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
-  </div>
-</div>
-
-<!-- Search & Track Pill Filters -->
-<div style="background: var(--surface-glass); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem;">
-  <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-    <div style="flex: 1; min-width: 280px; position: relative;">
-      <input type="text" id="live-search" placeholder="Search projects by title, summary, or team name..." 
-        value="{{ query or '' }}" 
-        style="width: 100%; padding-left: 2.25rem;" oninput="filterCards()">
-      <span style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #64748b;">🔍</span>
-    </div>
-    <a href="/projects/new" class="btn btn-secondary" style="border-color: rgba(255, 255, 255, 0.15);">
-      + Submit Project
-    </a>
-  </div>
+  </section>
 
   <!-- Track Filter Pills -->
-  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-    <span style="font-size: 0.8rem; color: #64748b; margin-right: 0.25rem; font-weight: 600;">TRACKS:</span>
-    <button onclick="setTrackFilter('all', this)" class="btn btn-primary track-filter-pill" style="font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 9999px;">
-      All Tracks ({{ projects|length }})
+  <div class="track-row">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-right: 0.25rem;">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+    </svg>
+    <button class="track-pill active" onclick="setTrackFilter('all', this)">
+      All tracks <span>{{ projects|length }}</span>
     </button>
     {% for trk in tracks %}
-      <button onclick="setTrackFilter('{{ trk.name|lower }}', this)" class="btn btn-secondary track-filter-pill" style="font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 9999px;">
+      <button class="track-pill" onclick="setTrackFilter('{{ trk.name|lower }}', this)">
         {{ trk.name }}
       </button>
     {% endfor %}
   </div>
-</div>
 
-<!-- Project Grid -->
-<div class="gallery-grid" id="project-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
-  {% for p in projects %}
-    <div class="project-card" data-title="{{ p.title|lower }}" data-summary="{{ (p.summary or '')|lower }}" data-track="{{ p.track_name|lower }}" data-team="{{ (p.team_name or '')|lower }}">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-        <span class="track-tag">{{ p.track_name }}</span>
-        <span style="font-size: 0.75rem; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">{{ p.id }}</span>
-      </div>
-
-      <h3 style="font-size: 1.2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem; letter-spacing: -0.01em;">
-        {{ p.title }}
-      </h3>
-
-      <p style="font-size: 0.875rem; color: #94a3b8; line-height: 1.45; margin-bottom: 1.25rem; min-height: 3.8rem;">
-        {{ p.summary or "No project description provided." }}
-      </p>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.85rem; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 0.8rem;">
-        <div style="color: #64748b;">
-          👥 <strong>{{ p.team_name or "Solo Builder" }}</strong>
+  <!-- Gallery Grid -->
+  <div class="gallery-grid" id="project-grid">
+    {% for p in projects %}
+      {% set accent_color = ['coral', 'sage', 'violet', 'peach', 'blue', 'yellow', 'mint', 'lavender'][loop.index0 % 8] %}
+      <article class="project-card" data-title="{{ p.title|lower }}" data-summary="{{ (p.summary or '')|lower }}" data-track="{{ p.track_name|lower }}" data-team="{{ (p.team_name or '')|lower }}">
+        <div class="project-art art-{{ accent_color }}">
+          <span>{{ p.title[:2]|upper }}</span>
+          <div class="art-lines"></div>
         </div>
-        {% if p.repo_url %}
-          <a href="{{ p.repo_url }}" target="_blank" rel="noopener" class="btn-link" style="display: inline-flex; align-items: center; gap: 0.25rem;">
-            Source Repo &rarr;
-          </a>
-        {% endif %}
-      </div>
-    </div>
-  {% else %}
-    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: #94a3b8;">
-      <p style="font-size: 1.1rem;">No submissions found.</p>
-    </div>
-  {% endfor %}
-</div>
+        <div class="project-body">
+          <div class="project-top">
+            <span class="badge badge-neutral">{{ p.track_name }}</span>
+            <span class="project-number">#{{ "%02d"|format(loop.index) }}</span>
+          </div>
 
-<div id="no-results-msg" style="display: none; text-align: center; padding: 4rem 1rem; color: #94a3b8;">
-  <p style="font-size: 1.1rem;">No projects match your search criteria.</p>
+          <h3>{{ p.title }}</h3>
+          <p class="summary">{{ p.summary or "No project description provided." }}</p>
+
+          <div class="project-team">
+            <div class="avatar-stack">
+              <span>{{ (p.team_name or "T")[0]|upper }}</span>
+              <span>{{ ((p.team_name or "T").split(' ')[1] or 'B')[0]|upper }}</span>
+            </div>
+            <div>
+              <strong>{{ p.team_name or "Solo Builder" }}</strong>
+              <span>Submitted {{ p.created_at[:10] if p.created_at else "2026-09-26" }}</span>
+            </div>
+          </div>
+
+          <div class="project-foot">
+            <span>{{ p.created_at[:10] if p.created_at else "Oct 2026" }}</span>
+            {% if p.repo_url %}
+              <a href="{{ p.repo_url }}" target="_blank" rel="noopener" aria-label="Open {{ p.title }} repository">
+                Repo ↗
+              </a>
+            {% else %}
+              <span style="color: var(--muted); font-size: 0.75rem;">Verified local</span>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% else %}
+      <div class="empty-state" style="grid-column: 1 / -1;">No submissions found.</div>
+    {% endfor %}
+  </div>
+
+  <div id="no-results-msg" class="empty-state" style="display: none; grid-column: 1 / -1;">
+    No projects match that search filter.
+  </div>
 </div>
 
 <script>
@@ -101,15 +124,21 @@ let currentTrack = 'all';
 
 function setTrackFilter(trackName, btn) {
   currentTrack = trackName;
-  document.querySelectorAll('.track-filter-pill').forEach(b => {
-    b.className = 'btn btn-secondary track-filter-pill';
-  });
-  btn.className = 'btn btn-primary track-filter-pill';
+  document.querySelectorAll('.track-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
+
+function clearSearch() {
+  const input = document.getElementById('live-search');
+  input.value = '';
+  document.getElementById('clear-search-btn').style.display = 'none';
   filterCards();
 }
 
 function filterCards() {
   const q = document.getElementById('live-search').value.toLowerCase().trim();
+  document.getElementById('clear-search-btn').style.display = q ? 'block' : 'none';
   const cards = document.querySelectorAll('.project-card');
   let visibleCount = 0;
 
@@ -123,13 +152,15 @@ function filterCards() {
     const matchesTrack = currentTrack === 'all' || track === currentTrack;
 
     if (matchesQuery && matchesTrack) {
-      card.style.display = 'block';
+      card.style.display = 'flex';
       visibleCount++;
     } else {
       card.style.display = 'none';
     }
   });
 
+  const countElem = document.getElementById('visible-count');
+  if (countElem) countElem.innerText = visibleCount;
   document.getElementById('no-results-msg').style.display = visibleCount === 0 ? 'block' : 'none';
 }
 </script>

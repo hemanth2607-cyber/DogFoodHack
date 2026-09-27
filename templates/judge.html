@@ -3,278 +3,354 @@
 {% block title %}Judge Scoring Workspace — DOGFOOD 2026{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
-  <div class="header-text">
-    <h1>Judge Scoring Workspace</h1>
-    <p>Logged in as: <strong>{{ judge.name }}</strong> (<code>{{ judge.id }}</code>) &bull; 
-      Assigned Tracks: 
-      {% for t in judge_tracks %}
-        <span class="badge track-badge" style="margin-left: 0.25rem;">{{ t }}</span>
-      {% else %}
-        <span class="badge" style="background: rgba(255,255,255,0.08); color: #94a3b8;">All Tracks</span>
-      {% endfor %}
-    </p>
-  </div>
-  <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.85rem 1.25rem; min-width: 240px;">
-    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
-      <span style="color: #94a3b8; font-weight: 500;">Review Progress</span>
-      <strong style="color: #38bdf8;">{{ progress.reviewed }} / {{ progress.total }} ({{ progress.percent }}%)</strong>
-    </div>
-    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 999px; height: 8px; overflow: hidden;">
-      <div style="background: linear-gradient(90deg, #38bdf8, #34d399); height: 100%; width: {{ progress.percent }}%; transition: width 0.4s ease;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Tabs -->
-<div style="display: flex; gap: 0.75rem; margin: 1.5rem 0 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.75rem;">
-  <button id="tab-queue-btn" onclick="showTab('queue')" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
-    📋 Evaluation Queue ({{ progress.total }})
-  </button>
-  <button id="tab-table-btn" onclick="showTab('table')" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
-    📊 Submitted Reviews ({{ scores|length }})
-  </button>
-</div>
-
-<!-- TAB 1: Evaluation Queue Cards -->
-<div id="tab-queue" style="display: block;">
-  {% if assigned_projects %}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.25rem;">
-      {% for p in assigned_projects %}
-        <div id="card-{{ p.id }}" class="card" style="background: rgba(30, 41, 59, 0.6); border: 1px solid {% if p.is_reviewed %}rgba(52, 211, 153, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
-              <span class="track-tag">{{ p.track_name }}</span>
-              <span id="badge-{{ p.id }}">
-                {% if p.is_reviewed %}
-                  <span class="badge badge-complete">✓ Scored</span>
-                {% else %}
-                  <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Needs Review</span>
-                {% endif %}
-              </span>
-            </div>
-
-            <h3 style="margin: 0.25rem 0 0.5rem; font-size: 1.15rem; color: #f8fafc;">{{ p.title }}</h3>
-            <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 0.75rem; min-height: 2.8rem;">
-              {{ p.summary or "No summary provided." }}
-            </p>
-            {% if p.repo_url %}
-              <div style="margin-bottom: 0.75rem;">
-                <a href="{{ p.repo_url }}" target="_blank" rel="noopener" style="font-size: 0.8rem; color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
-                  🔗 Source Code ({{ p.repo_url }})
-                </a>
-              </div>
-            {% endif %}
-          </div>
-
-          <!-- Quick Expand / Score Action -->
-          <div>
-            <button onclick="toggleScoringForm('{{ p.id }}')" class="btn {% if p.is_reviewed %}btn-secondary{% else %}btn-primary{% endif %}" style="width: 100%; font-size: 0.85rem; padding: 0.5rem 0;">
-              {% if p.is_reviewed %}✏️ Edit Evaluation{% else %}⭐ Score Project{% endif %}
-            </button>
-
-            <!-- Collapsible Form -->
-            <div id="form-panel-{{ p.id }}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-              <!-- AI Co-Pilot trigger -->
-              <div style="margin-bottom: 1rem; background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.1)); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 0.6rem 0.85rem; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8rem; color: #cbd5e1;">🤖 AI Rubric Co-Pilot:</span>
-                <button type="button" onclick="fetchAISuggestion('{{ p.id }}')" id="ai-btn-{{ p.id }}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; border-color: #38bdf8; color: #38bdf8;">
-                  ⚡ Auto-Assess with AI
-                </button>
-              </div>
-
-              <!-- Sliders -->
-              <div style="margin-bottom: 0.85rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #e2e8f0; margin-bottom: 0.25rem;">
-                  <span>Functionality (40% wt)</span>
-                  <strong id="val-func-{{ p.id }}" style="color: #38bdf8;">{{ p.score.criteria.get('functionality', 3.0) if p.is_reviewed else 3.0 }} / 5.0</strong>
-                </div>
-                <input type="range" id="input-func-{{ p.id }}" min="1.0" max="5.0" step="0.1" value="{{ p.score.criteria.get('functionality', 3.0) if p.is_reviewed else 3.0 }}" 
-                  oninput="updateSlider('{{ p.id }}')" style="width: 100%; accent-color: #38bdf8;">
-              </div>
-
-              <div style="margin-bottom: 0.85rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #e2e8f0; margin-bottom: 0.25rem;">
-                  <span>Technical Quality (35% wt)</span>
-                  <strong id="val-qual-{{ p.id }}" style="color: #38bdf8;">{{ p.score.criteria.get('quality', 3.0) if p.is_reviewed else 3.0 }} / 5.0</strong>
-                </div>
-                <input type="range" id="input-qual-{{ p.id }}" min="1.0" max="5.0" step="0.1" value="{{ p.score.criteria.get('quality', 3.0) if p.is_reviewed else 3.0 }}" 
-                  oninput="updateSlider('{{ p.id }}')" style="width: 100%; accent-color: #38bdf8;">
-              </div>
-
-              <div style="margin-bottom: 0.85rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #e2e8f0; margin-bottom: 0.25rem;">
-                  <span>Innovation & Impact (25% wt)</span>
-                  <strong id="val-innov-{{ p.id }}" style="color: #38bdf8;">{{ p.score.criteria.get('innovation', 3.0) if p.is_reviewed else 3.0 }} / 5.0</strong>
-                </div>
-                <input type="range" id="input-innov-{{ p.id }}" min="1.0" max="5.0" step="0.1" value="{{ p.score.criteria.get('innovation', 3.0) if p.is_reviewed else 3.0 }}" 
-                  oninput="updateSlider('{{ p.id }}')" style="width: 100%; accent-color: #38bdf8;">
-              </div>
-
-              <div style="background: rgba(0, 0, 0, 0.25); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.8rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between;">
-                <span style="color: #94a3b8;">Composite Score:</span>
-                <strong id="val-composite-{{ p.id }}" style="color: #34d399;">
-                  {% if p.is_reviewed %}
-                    {{ (p.score.criteria.get('functionality', 3.0) * 0.40 + p.score.criteria.get('quality', 3.0) * 0.35 + p.score.criteria.get('innovation', 3.0) * 0.25)|round(2) }}
-                  {% else %}
-                    3.00
-                  {% endif %}
-                  / 5.0
-                </strong>
-              </div>
-
-              <!-- Notes -->
-              <div style="margin-bottom: 0.85rem;">
-                <label style="display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem;">Judge Notes & Feedback</label>
-                <textarea id="input-comment-{{ p.id }}" rows="2" style="width: 100%; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #f8fafc; font-size: 0.8rem; padding: 0.4rem; resize: vertical;" placeholder="Observations on architecture, execution, and presentation...">{{ p.score.comment if p.is_reviewed else "" }}</textarea>
-              </div>
-
-              <!-- Actions -->
-              <div style="display: flex; gap: 0.5rem;">
-                <button type="button" onclick="submitScore('{{ p.id }}')" id="submit-btn-{{ p.id }}" class="btn btn-primary" style="flex: 1; font-size: 0.8rem; padding: 0.45rem;">
-                  💾 Save Review
-                </button>
-                <button type="button" onclick="toggleScoringForm('{{ p.id }}')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.45rem 0.75rem;">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: 3rem 1rem; color: #94a3b8;">
-      <p>No projects currently assigned to your tracks.</p>
-    </div>
-  {% endif %}
-</div>
-
-<!-- TAB 2: Submitted Reviews Table -->
-<div id="tab-table" style="display: none;">
-  <div class="table-container">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Project</th>
-          <th>Track</th>
-          <th>Functionality (40%)</th>
-          <th>Quality (35%)</th>
-          <th>Innovation (25%)</th>
-          <th>Composite</th>
-          <th>Judge Notes</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="scores-table-body">
-        {% for s in scores or [] %}
-          {% set f = s.criteria.get('functionality', 0) %}
-          {% set q = s.criteria.get('quality', 0) %}
-          {% set i = s.criteria.get('innovation', 0) %}
-          {% set comp = (f * 0.40 + q * 0.35 + i * 0.25)|round(2) %}
-          <tr>
-            <td><strong>{{ s.title }}</strong><br><small style="color: #64748b;">{{ s.project_id }}</small></td>
-            <td><span class="track-tag">{{ s.track_name }}</span></td>
-            <td>{{ f }} / 5</td>
-            <td>{{ q }} / 5</td>
-            <td>{{ i }} / 5</td>
-            <td><strong style="color: #38bdf8;">{{ comp }}</strong></td>
-            <td style="max-width: 250px; font-size: 0.85rem;"><em>"{{ s.comment }}"</em></td>
-            <td><span class="badge badge-complete">Submitted</span></td>
-          </tr>
+<div class="page-wrap workspace">
+  <!-- Workspace Header -->
+  <section class="workspace-header">
+    <div>
+      <p class="kicker">JUDGE WORKSPACE / {{ judge.name|upper }} ({{ judge.id }})</p>
+      <h1>Make the work<br><em>better through feedback.</em></h1>
+      <p class="hero-copy">
+        Your reviews are private, structured, and designed to help teams learn.
+        Assigned tracks: 
+        {% for t in judge_tracks %}
+          <span class="badge badge-coral" style="margin-left: 0.25rem;">{{ t }}</span>
         {% else %}
-          <tr><td colspan="8">No assigned reviews found.</td></tr>
+          <span class="badge badge-neutral" style="margin-left: 0.25rem;">All Tracks</span>
         {% endfor %}
-      </tbody>
-    </table>
+      </p>
+    </div>
+
+    <!-- Progress Card -->
+    <div class="progress-card">
+      <div class="progress-top">
+        <span>Review progress</span>
+        <strong>{{ progress.reviewed }} <small>/ {{ progress.total }}</small></strong>
+      </div>
+      <div class="progress-track">
+        <span style="width: {{ progress.percent }}%;"></span>
+      </div>
+      <p>{{ progress.percent }}% complete · {{ progress.total - progress.reviewed }} remaining</p>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <div class="workspace-tabs">
+    <button id="tab-queue-btn" class="active" onclick="showTab('queue')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+      </svg>
+      Evaluation queue <span>{{ progress.total - progress.reviewed }}</span>
+    </button>
+    <button id="tab-table-btn" onclick="showTab('table')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+      Submitted reviews <span>{{ scores|length }}</span>
+    </button>
+  </div>
+
+  <!-- TAB 1: Evaluation Queue -->
+  <div id="tab-queue">
+    {% if assigned_projects %}
+      <div class="judge-grid">
+        {% for p in assigned_projects %}
+          {% set accent_color = ['coral', 'sage', 'violet', 'peach', 'blue', 'yellow', 'mint', 'lavender'][loop.index0 % 8] %}
+          <article class="project-card" id="card-{{ p.id }}">
+            <div class="project-art art-{{ accent_color }}">
+              <span>{{ p.title[:2]|upper }}</span>
+              <div class="art-lines"></div>
+            </div>
+            <div class="project-body">
+              <div class="project-top">
+                <span class="badge badge-coral">{{ p.track_name }}</span>
+                {% if p.is_reviewed %}
+                  <span class="badge badge-green">✓ Scored</span>
+                {% else %}
+                  <span class="badge badge-violet">Needs review</span>
+                {% endif %}
+              </div>
+
+              <h3>{{ p.title }}</h3>
+              <p class="summary">{{ p.summary or "No summary provided." }}</p>
+
+              <div class="project-team">
+                <div class="avatar-stack">
+                  <span>{{ (p.team_name or "T")[0]|upper }}</span>
+                  <span>{{ ((p.team_name or "T").split(' ')[1] or 'B')[0]|upper }}</span>
+                </div>
+                <div>
+                  <strong>{{ p.team_name or "Solo Builder" }}</strong>
+                  <span>Project ID: {{ p.id }}</span>
+                </div>
+              </div>
+
+              <div class="project-foot">
+                <span>{{ p.created_at[:10] if p.created_at else "Oct 2026" }}</span>
+                {% if p.repo_url %}
+                  <a href="{{ p.repo_url }}" target="_blank" rel="noopener">Repo ↗</a>
+                {% endif %}
+              </div>
+
+              <button class="text-action" onclick="openReviewModal('{{ p.id }}', '{{ p.title|escape }}', '{{ p.track_name|escape }}', '{{ p.team_name|escape }}', '{{ (p.summary or '')|escape }}', {{ p.score.criteria.get('functionality', 3.0) if p.is_reviewed else 3.0 }}, {{ p.score.criteria.get('quality', 3.0) if p.is_reviewed else 3.0 }}, {{ p.score.criteria.get('innovation', 3.0) if p.is_reviewed else 3.0 }}, '{{ (p.score.comment or '')|escape }}')">
+                {{ 'Edit review ↗' if p.is_reviewed else 'Start review ↗' }}
+              </button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No projects currently assigned to your tracks.</div>
+    {% endif %}
+  </div>
+
+  <!-- TAB 2: Submitted Reviews Table -->
+  <div id="tab-table" style="display: none;">
+    <div class="table-card">
+      <div class="table-heading">
+        <div>
+          <p class="kicker">YOUR HISTORY</p>
+          <h2>Submitted reviews</h2>
+        </div>
+        <span class="badge badge-green">✓ {{ scores|length }} saved</span>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Track</th>
+              <th>Functionality (40%)</th>
+              <th>Quality (35%)</th>
+              <th>Innovation (25%)</th>
+              <th>Composite</th>
+              <th>Judge Notes</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in scores or [] %}
+              {% set f = s.criteria.get('functionality', 0) %}
+              {% set q = s.criteria.get('quality', 0) %}
+              {% set i = s.criteria.get('innovation', 0) %}
+              {% set comp = (f * 0.40 + q * 0.35 + i * 0.25)|round(2) %}
+              <tr>
+                <td>
+                  <strong>{{ s.title }}</strong>
+                  <span>ID: {{ s.project_id }}</span>
+                </td>
+                <td><span class="badge badge-neutral">{{ s.track_name }}</span></td>
+                <td>{{ f }} / 5.0</td>
+                <td>{{ q }} / 5.0</td>
+                <td>{{ i }} / 5.0</td>
+                <td><strong class="score-number">{{ comp }}</strong></td>
+                <td style="max-width: 260px; font-size: 11px;"><em>"{{ s.comment }}"</em></td>
+                <td><span class="badge badge-green">✓ Saved</span></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="8" style="text-align: center; padding: 2rem;">No reviews submitted yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal Dialog -->
+<div id="review-modal-backdrop" class="modal-backdrop" style="display: none;" onclick="closeOnBackdrop(event)">
+  <div class="review-modal">
+    <div class="modal-top">
+      <div>
+        <p class="kicker">EVALUATING / <span id="modal-track"></span></p>
+        <h2 id="modal-title"></h2>
+        <p id="modal-subtitle"></p>
+      </div>
+      <button class="icon-button" onclick="closeReviewModal()" aria-label="Close" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--muted);">✕</button>
+    </div>
+
+    <div class="score-layout">
+      <!-- Criteria Sliders -->
+      <div class="criteria-list">
+        <label class="criterion">
+          <div>
+            <span>Functionality & Execution</span>
+            <strong><span id="display-func">3.0</span> <small>/ 5.0</small></strong>
+          </div>
+          <input type="range" id="input-func" min="1.0" max="5.0" step="0.1" value="3.0" oninput="recalcComposite()">
+          <small>Weight: 40% — Does it run reliably and deliver on its core premise?</small>
+        </label>
+
+        <label class="criterion">
+          <div>
+            <span>Code Quality & Architecture</span>
+            <strong><span id="display-qual">3.0</span> <small>/ 5.0</small></strong>
+          </div>
+          <input type="range" id="input-qual" min="1.0" max="5.0" step="0.1" value="3.0" oninput="recalcComposite()">
+          <small>Weight: 35% — Is the structure modular, testable, and maintainable?</small>
+        </label>
+
+        <label class="criterion">
+          <div>
+            <span>Innovation & Technical Ambition</span>
+            <strong><span id="display-innov">3.0</span> <small>/ 5.0</small></strong>
+          </div>
+          <input type="range" id="input-innov" min="1.0" max="5.0" step="0.1" value="3.0" oninput="recalcComposite()">
+          <small>Weight: 25% — Does it reach beyond standard patterns and solve hard problems?</small>
+        </label>
+
+        <label class="notes">
+          <span>Judge Notes & Constructive Feedback</span>
+          <textarea id="modal-comment" rows="3" placeholder="What stood out? What architectural decisions could be stronger?"></textarea>
+        </label>
+      </div>
+
+      <!-- Composite Display & AI Co-pilot -->
+      <div class="composite-card">
+        <span class="muted-label">COMPOSITE SCORE</span>
+        <strong id="modal-composite-val">3.00</strong>
+        <span>out of 5.0</span>
+
+        <div class="score-ring" id="modal-score-ring" style="--score: 60%;">
+          <div><span id="modal-score-pct">60</span>%</div>
+        </div>
+
+        <button class="copilot-button" id="modal-copilot-btn" type="button" onclick="fetchAISuggestionModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
+          </svg>
+          <span id="copilot-btn-text">AI rubric co-pilot</span>
+        </button>
+        <p id="copilot-desc">Synthesize project brief and generate calibrated baseline scores.</p>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary outline-button" type="button" onclick="closeReviewModal()">Cancel</button>
+      <button class="btn btn-primary dark-button" id="modal-save-btn" type="button" onclick="submitModalScore()">✓ Save review</button>
+    </div>
   </div>
 </div>
 
 <script>
-function showTab(tabName) {
+let activeProjectId = null;
+
+function showTab(tab) {
   const queueTab = document.getElementById('tab-queue');
   const tableTab = document.getElementById('tab-table');
   const queueBtn = document.getElementById('tab-queue-btn');
   const tableBtn = document.getElementById('tab-table-btn');
 
-  if (tabName === 'queue') {
+  if (tab === 'queue') {
     queueTab.style.display = 'block';
     tableTab.style.display = 'none';
-    queueBtn.className = 'btn btn-primary';
-    tableBtn.className = 'btn btn-secondary';
+    queueBtn.classList.add('active');
+    tableBtn.classList.remove('active');
   } else {
     queueTab.style.display = 'none';
     tableTab.style.display = 'block';
-    queueBtn.className = 'btn btn-secondary';
-    tableBtn.className = 'btn btn-primary';
+    queueBtn.classList.remove('active');
+    tableBtn.classList.add('active');
   }
 }
 
-function toggleScoringForm(projectId) {
-  const panel = document.getElementById(`form-panel-${projectId}`);
-  if (!panel) return;
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+function openReviewModal(projectId, title, track, team, summary, f, q, i, comment) {
+  activeProjectId = projectId;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-track').textContent = track.toUpperCase();
+  document.getElementById('modal-subtitle').textContent = (team ? team + ' · ' : '') + (summary || '');
+
+  document.getElementById('input-func').value = f;
+  document.getElementById('input-qual').value = q;
+  document.getElementById('input-innov').value = i;
+  document.getElementById('modal-comment').value = comment;
+
+  recalcComposite();
+
+  const copilotBtn = document.getElementById('modal-copilot-btn');
+  copilotBtn.classList.remove('active');
+  document.getElementById('copilot-btn-text').textContent = 'AI rubric co-pilot';
+
+  document.getElementById('review-modal-backdrop').style.display = 'grid';
 }
 
-function updateSlider(projectId) {
-  const f = parseFloat(document.getElementById(`input-func-${projectId}`).value);
-  const q = parseFloat(document.getElementById(`input-qual-${projectId}`).value);
-  const i = parseFloat(document.getElementById(`input-innov-${projectId}`).value);
-
-  document.getElementById(`val-func-${projectId}`).textContent = `${f.toFixed(1)} / 5.0`;
-  document.getElementById(`val-qual-${projectId}`).textContent = `${q.toFixed(1)} / 5.0`;
-  document.getElementById(`val-innov-${projectId}`).textContent = `${i.toFixed(1)} / 5.0`;
-
-  const composite = (f * 0.40 + q * 0.35 + i * 0.25).toFixed(2);
-  document.getElementById(`val-composite-${projectId}`).textContent = `${composite} / 5.0`;
+function closeReviewModal() {
+  document.getElementById('review-modal-backdrop').style.display = 'none';
+  activeProjectId = null;
 }
 
-async function fetchAISuggestion(projectId) {
-  const btn = document.getElementById(`ai-btn-${projectId}`);
-  const origText = btn.textContent;
-  btn.textContent = '⏳ Analyzing...';
+function closeOnBackdrop(e) {
+  if (e.target.id === 'review-modal-backdrop') {
+    closeReviewModal();
+  }
+}
+
+function recalcComposite() {
+  const f = parseFloat(document.getElementById('input-func').value);
+  const q = parseFloat(document.getElementById('input-qual').value);
+  const i = parseFloat(document.getElementById('input-innov').value);
+
+  document.getElementById('display-func').textContent = f.toFixed(1);
+  document.getElementById('display-qual').textContent = q.toFixed(1);
+  document.getElementById('display-innov').textContent = i.toFixed(1);
+
+  const composite = (f * 0.40 + q * 0.35 + i * 0.25);
+  const pct = Math.round(composite * 20);
+
+  document.getElementById('modal-composite-val').textContent = composite.toFixed(2);
+  document.getElementById('modal-score-pct').textContent = pct;
+  document.getElementById('modal-score-ring').style.setProperty('--score', `${pct}%`);
+}
+
+async function fetchAISuggestionModal() {
+  if (!activeProjectId) return;
+  const btn = document.getElementById('modal-copilot-btn');
+  const btnText = document.getElementById('copilot-btn-text');
+  btnText.textContent = 'Analyzing pitch...';
   btn.disabled = true;
 
   try {
-    const res = await fetch(`/api/judge/ai-suggest?project_id=${projectId}`);
-    if (!res.ok) throw new Error('Failed to fetch AI suggestions');
+    const res = await fetch(`/api/judge/ai-suggest?project_id=${activeProjectId}`);
+    if (!res.ok) throw new Error('AI suggestion failed');
     const data = await res.json();
 
-    document.getElementById(`input-func-${projectId}`).value = data.suggested_criteria.functionality;
-    document.getElementById(`input-qual-${projectId}`).value = data.suggested_criteria.quality;
-    document.getElementById(`input-innov-${projectId}`).value = data.suggested_criteria.innovation;
-    document.getElementById(`input-comment-${projectId}`).value = data.suggested_comment;
+    document.getElementById('input-func').value = data.suggested_criteria.functionality;
+    document.getElementById('input-qual').value = data.suggested_criteria.quality;
+    document.getElementById('input-innov').value = data.suggested_criteria.innovation;
+    document.getElementById('modal-comment').value = data.suggested_comment;
 
-    updateSlider(projectId);
-    btn.textContent = '✓ AI Applied!';
-    btn.style.borderColor = '#34d399';
-    btn.style.color = '#34d399';
+    recalcComposite();
+
+    btn.classList.add('active');
+    btnText.textContent = '✓ AI calibrated';
+    document.getElementById('copilot-desc').textContent = 'Suggested rubric values and qualitative notes populated.';
   } catch (err) {
     alert('AI Assistant error: ' + err.message);
-    btn.textContent = origText;
+    btnText.textContent = 'AI rubric co-pilot';
   } finally {
     btn.disabled = false;
   }
 }
 
-async function submitScore(projectId) {
-  const submitBtn = document.getElementById(`submit-btn-${projectId}`);
-  const f = parseFloat(document.getElementById(`input-func-${projectId}`).value);
-  const q = parseFloat(document.getElementById(`input-qual-${projectId}`).value);
-  const i = parseFloat(document.getElementById(`input-innov-${projectId}`).value);
-  const comment = document.getElementById(`input-comment-${projectId}`).value;
+async function submitModalScore() {
+  if (!activeProjectId) return;
+  const saveBtn = document.getElementById('modal-save-btn');
+  const f = parseFloat(document.getElementById('input-func').value);
+  const q = parseFloat(document.getElementById('input-qual').value);
+  const i = parseFloat(document.getElementById('input-innov').value);
+  const comment = document.getElementById('modal-comment').value;
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Saving...';
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
 
   try {
     const res = await fetch('/api/judge/scores', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        project_id: projectId,
+        project_id: activeProjectId,
         functionality: f,
         quality: q,
         innovation: i,
@@ -285,28 +361,15 @@ async function submitScore(projectId) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Failed to submit score');
 
-    // Update UI badge
-    const badgeContainer = document.getElementById(`badge-${projectId}`);
-    if (badgeContainer) {
-      badgeContainer.innerHTML = '<span class="badge badge-complete">✓ Scored</span>';
-    }
-    const card = document.getElementById(`card-${projectId}`);
-    if (card) {
-      card.style.borderColor = 'rgba(52, 211, 153, 0.4)';
-    }
-
-    submitBtn.textContent = '✓ Saved!';
+    saveBtn.textContent = '✓ Saved!';
     setTimeout(() => {
-      toggleScoringForm(projectId);
-      submitBtn.textContent = '💾 Save Review';
-      submitBtn.disabled = false;
+      closeReviewModal();
       window.location.reload();
-    }, 700);
-
+    }, 600);
   } catch (err) {
-    alert('Error submitting score: ' + err.message);
-    submitBtn.textContent = '💾 Save Review';
-    submitBtn.disabled = false;
+    alert('Submission error: ' + err.message);
+    saveBtn.disabled = false;
+    saveBtn.textContent = '✓ Save review';
   }
 }
 </script>
