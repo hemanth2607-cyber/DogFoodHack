@@ -94,6 +94,14 @@ python -m pytest tests/test_platform.py -v
    - Pure local CSS (`static/style.css`) and inline SVG iconography — no external Google Fonts or CDN requests.
    - Can run with the laptop network adapter completely disabled.
 
+8. **Cryptographic Score Audit Trail (`/audit` & `/api/audit/verify`):**
+   - Deterministic SHA-256 Merkle chain linking every evaluation record.
+   - Mathematically proves zero post-deadline score tampering; anyone can verify the hash chain in real-time.
+
+9. **Interactive Project Deep-Dive & Duplicate-Proof Community Ballot:**
+   - Clicking any project opens the architectural dossier modal with team contributor lists and problem statement.
+   - Strictly enforced **1 vote per voter limit** (with SQLite `UNIQUE(voter_token)` constraint and client fingerprinting); duplicate attempts return `HTTP 409 Conflict`.
+
 ---
 
 ## Seeded Persona Logins
