@@ -21,7 +21,7 @@ from src.auth import (
     require_organizer,
     require_judge
 )
-from src.normalization import get_normalized_scores
+from src.normalization import get_normalized_scores, get_judge_severity_profiles
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -516,6 +516,13 @@ def organizer_dashboard(request: Request):
                 "percent": min(100.0, pct)
             })
 
+    # Attach judge rater severity profiles
+    severity_profiles = get_judge_severity_profiles()
+    for jp in judge_progress:
+        prof = severity_profiles.get(jp["id"], {})
+        jp["classification"] = prof.get("classification", "Balanced")
+        jp["delta"] = prof.get("delta", 0.0)
+
     leaderboard = get_normalized_scores()
     
     return templates.TemplateResponse(
@@ -538,7 +545,7 @@ def organizer_dashboard(request: Request):
 @app.get("/api/export.csv")
 def export_csv(current_user: AuthUser = Depends(require_organizer)):
     """
-    Exports cross-judge normalized results as CSV.
+    Exports cross-judge normalized results as CSV with statistical precision metrics.
     Restricted strictly to organizers.
     """
     leaderboard = get_normalized_scores()
@@ -549,23 +556,33 @@ def export_csv(current_user: AuthUser = Depends(require_organizer)):
     # Header row (with commas)
     writer.writerow([
         "rank",
+        "track_rank",
         "project_id",
         "title",
         "track_name",
         "reviews_count",
         "raw_score_avg",
-        "normalized_score"
+        "normalized_score",
+        "quality_avg",
+        "ci_lower",
+        "ci_upper",
+        "standard_error"
     ])
 
     for row in leaderboard:
         writer.writerow([
             row["rank"],
+            row["track_rank"],
             row["project_id"],
             row["title"],
             row["track_name"],
             row["review_count"],
             row["raw_score_avg"],
-            row["normalized_score"]
+            row["normalized_score"],
+            row.get("quality_avg", ""),
+            row.get("ci_lower", ""),
+            row.get("ci_upper", ""),
+            row.get("standard_error", "")
         ])
 
     csv_data = output.getvalue()
@@ -697,10 +714,11 @@ def get_community_status(request: Request):
     }
 
 # --- ENHANCEMENT 3: CRYPTOGRAPHIC SCORE PROVENANCE & AUDIT TRAIL ---
-def compute_score_audit_chain() -> Dict[str, Any]:
+def compute_score_audit_chain(is_organizer: bool = False) -> Dict[str, Any]:
     """
     Generates a deterministic cryptographic SHA-256 Merkle chain across all 
     recorded scores in the platform to prove zero post-deadline score tampering.
+    Applies zero-knowledge privacy masking to protect judge peer isolation for non-organizers.
     """
     with get_db() as conn:
         rows = conn.execute("""
@@ -717,11 +735,25 @@ def compute_score_audit_chain() -> Dict[str, Any]:
     for row in rows:
         entry_str = f"{row['id']}:{row['judge_id']}:{row['project_id']}:{row['criteria_json']}:{row['updated_at']}:{prev_hash}"
         curr_hash = hashlib.sha256(entry_str.encode()).hexdigest()
+
+        # Zero-Knowledge privacy masking:
+        # Organizers see full evaluator identities.
+        # Public / Judges see cryptographic enclave tokens to protect peer isolation.
+        if is_organizer:
+            j_name = row["judge_name"]
+            j_display_id = row["judge_id"]
+            p_title = row["title"]
+        else:
+            token_hash = hashlib.sha256(row["judge_id"].encode()).hexdigest()[:6]
+            j_name = f"Enclave Evaluator #{token_hash}"
+            j_display_id = f"enc_{token_hash}"
+            p_title = row["title"]
+
         blocks.append({
             "block_index": row["id"],
-            "judge_name": row["judge_name"],
-            "judge_id": row["judge_id"],
-            "project_title": row["title"],
+            "judge_name": j_name,
+            "judge_id": j_display_id,
+            "project_title": p_title,
             "project_id": row["project_id"],
             "prev_hash": prev_hash,
             "block_hash": curr_hash,
@@ -735,6 +767,7 @@ def compute_score_audit_chain() -> Dict[str, Any]:
         "total_blocks": len(blocks),
         "genesis_hash": "0" * 64,
         "chain_head": prev_hash,
+        "is_anonymized": not is_organizer,
         "recent_blocks": blocks[-12:] if blocks else [],
         "verified_at": datetime.now(timezone.utc).isoformat()
     }
@@ -742,10 +775,11 @@ def compute_score_audit_chain() -> Dict[str, Any]:
 @app.get("/audit", response_class=HTMLResponse)
 def audit_view(request: Request):
     """
-    Public cryptographic audit page verifying score integrity.
+    Public cryptographic audit page verifying score integrity with zero-knowledge masking.
     """
     current_user = get_current_user_optional(request)
-    audit_data = compute_score_audit_chain()
+    is_organizer = current_user.is_organizer() if current_user else False
+    audit_data = compute_score_audit_chain(is_organizer=is_organizer)
     return templates.TemplateResponse(
         request=request,
         name="audit.html",
@@ -756,9 +790,11 @@ def audit_view(request: Request):
     )
 
 @app.get("/api/audit/verify")
-def api_verify_audit():
+def api_verify_audit(request: Request):
     """
     API endpoint returning cryptographic verification proof.
     """
-    return compute_score_audit_chain()
+    current_user = get_current_user_optional(request)
+    is_organizer = current_user.is_organizer() if current_user else False
+    return compute_score_audit_chain(is_organizer=is_organizer)
 

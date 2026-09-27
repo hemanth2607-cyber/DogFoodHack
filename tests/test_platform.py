@@ -2,7 +2,7 @@ import pytest
 import uuid
 from fastapi.testclient import TestClient
 from src.main import app
-from src.normalization import get_normalized_scores
+from src.normalization import get_normalized_scores, get_judge_severity_profiles
 
 client = TestClient(app)
 
@@ -132,3 +132,23 @@ def test_cryptographic_audit_chain():
     assert data["status"] == "VALIDATED_TAMPER_FREE"
     assert len(data["chain_head"]) == 64  # Valid SHA-256 hex string
     assert data["total_blocks"] >= 100
+
+def test_judge_severity_profiling():
+    profiles = get_judge_severity_profiles()
+    assert len(profiles) > 0
+    sample = list(profiles.values())[0]
+    assert "mean" in sample
+    assert "std" in sample
+    assert "classification" in sample
+    assert sample["classification"] in ("Lenient", "Strict", "Balanced", "Zero-Variance")
+
+def test_precision_metrics_and_tie_breaking():
+    leaderboard = get_normalized_scores()
+    assert len(leaderboard) > 0
+    for r in leaderboard:
+        assert "standard_error" in r
+        assert "ci_lower" in r
+        assert "ci_upper" in r
+        assert "track_rank" in r
+        assert r["ci_lower"] <= r["normalized_score"] <= r["ci_upper"]
+

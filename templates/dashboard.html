@@ -144,10 +144,10 @@
             <tr>
               <th>Rank</th>
               <th>Project</th>
-              <th>Track</th>
+              <th>Track &amp; Track Rank</th>
               <th>Reviews</th>
               <th>Raw average</th>
-              <th>Normalized</th>
+              <th>Normalized &amp; 95% CI</th>
             </tr>
           </thead>
           <tbody>
@@ -162,10 +162,16 @@
                   <strong>{{ r.title }}</strong>
                   <span>ID: {{ r.project_id }}</span>
                 </td>
-                <td><span class="badge badge-neutral">{{ r.track_name }}</span></td>
+                <td>
+                  <span class="badge badge-neutral">{{ r.track_name }}</span>
+                  <span style="display: block; font-size: 10px; color: var(--muted); margin-top: 2px;">#{{ r.track_rank }} in track</span>
+                </td>
                 <td>{{ r.review_count }} / 3</td>
                 <td>{{ r.raw_score_avg }}</td>
-                <td><strong class="score-number">{{ r.normalized_score }}</strong></td>
+                <td>
+                  <strong class="score-number">{{ r.normalized_score }}</strong>
+                  <span style="font-size: 11px; color: var(--muted);" title="95% Confidence Interval">±{{ r.ci_margin }}</span>
+                </td>
               </tr>
             {% else %}
               <tr><td colspan="6" style="text-align: center; padding: 2rem;">No submissions recorded yet.</td></tr>
@@ -191,9 +197,14 @@
           <div class="judge-meter">
             <div>
               <span>{{ j.completed }} / {{ j.assigned }} reviews</span>
-              <span class="badge {% if j.percent >= 100 %}badge-green{% elif j.completed > 0 %}badge-violet{% else %}badge-neutral{% endif %}">
-                {% if j.percent >= 100 %}Complete{% elif j.completed > 0 %}In progress{% else %}Pending{% endif %}
-              </span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <span class="badge {% if j.classification == 'Lenient' %}badge-coral{% elif j.classification == 'Strict' %}badge-violet{% elif j.classification == 'Zero-Variance' %}badge-blue{% else %}badge-green{% endif %}" title="Rater Severity Classification">
+                  {{ j.classification }} ({{ '+' if j.delta > 0 else '' }}{{ j.delta }})
+                </span>
+                <span class="badge {% if j.percent >= 100 %}badge-green{% elif j.completed > 0 %}badge-violet{% else %}badge-neutral{% endif %}">
+                  {% if j.percent >= 100 %}Complete{% elif j.completed > 0 %}In progress{% else %}Pending{% endif %}
+                </span>
+              </div>
             </div>
             <div class="progress-track">
               <span style="width: {{ j.percent }}%;"></span>
