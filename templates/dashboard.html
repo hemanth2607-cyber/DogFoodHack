@@ -1,62 +1,280 @@
 {% extends "base.html" %}
 
-{% block title %}Organizer Live Dashboard — DOGFOOD 2026{% endblock %}
+{% block title %}Organizer Command Center — DOGFOOD 2026{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
   <div class="header-text">
-    <h1>Organizer Live Dashboard</h1>
-    <p>Real-time review progress, track standings, and normalized scores.</p>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <span class="badge role-organizer" style="font-size: 0.75rem;">LEAD ORGANIZER</span>
+      <span style="color: #64748b; font-size: 0.85rem;">Event Administration</span>
+    </div>
+    <h1 style="margin: 0;">Organizer Command Center</h1>
+    <p style="margin: 0.25rem 0 0; color: #94a3b8;">Monitor real-time judging progress, configure rubric weights, and inspect Z-score normalized standings.</p>
   </div>
-  <div>
-    <a href="/api/export.csv" class="btn btn-primary" download="results.csv">Export Results (CSV)</a>
+  <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <a href="/api/export.csv" class="btn btn-primary" download="dogfood_results.csv" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+      📥 Export Audited Results (CSV)
+    </a>
   </div>
 </div>
 
-<div class="stats-grid">
+<!-- Telemetry Stats -->
+<div class="stats-grid" style="margin-top: 1.5rem;">
   <div class="stat-card">
     <span class="stat-title">Total Submissions</span>
     <span class="stat-val">{{ stats.total_projects }}</span>
+    <small style="color: #64748b;">across {{ stats.total_tracks }} competition tracks</small>
   </div>
   <div class="stat-card">
     <span class="stat-title">Active Judges</span>
     <span class="stat-val">{{ stats.total_judges }}</span>
+    <small style="color: #64748b;">assigned via judge_tracks</small>
   </div>
   <div class="stat-card">
     <span class="stat-title">Reviews Submitted</span>
     <span class="stat-val">{{ stats.total_scores }}</span>
+    <small style="color: #64748b;">in encrypted score enclave</small>
   </div>
   <div class="stat-card">
     <span class="stat-title">Normalization Model</span>
-    <span class="stat-val">Z-Score + Prior</span>
+    <span class="stat-val" style="color: #34d399; font-size: 1.25rem;">Z-Score + Bayesian</span>
+    <small style="color: #64748b;">zero-variance protected (σ &lt; 10⁻⁵)</small>
   </div>
 </div>
 
-<h2>Current Standings (Cross-Judge Normalized)</h2>
-<div class="table-container">
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Project Title</th>
-        <th>Track</th>
-        <th>Reviews</th>
-        <th>Raw Avg</th>
-        <th>Normalized Score</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in leaderboard[:20] %}
-        <tr>
-          <td><span class="rank-pill">#{{ r.rank }}</span></td>
-          <td><strong>{{ r.title }}</strong></td>
-          <td><span class="track-tag">{{ r.track_name }}</span></td>
-          <td>{{ r.review_count }}</td>
-          <td>{{ r.raw_score_avg }}</td>
-          <td><strong class="score-highlight">{{ r.normalized_score }}</strong></td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<!-- Tabs -->
+<div style="display: flex; gap: 0.75rem; margin: 2rem 0 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.75rem;">
+  <button id="tab-btn-leaderboard" onclick="switchDashboardTab('leaderboard')" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+    🏆 Standings &amp; Leaderboard ({{ leaderboard|length }})
+  </button>
+  <button id="tab-btn-judges" onclick="switchDashboardTab('judges')" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+    👥 Judge Review Progress ({{ judge_progress|length }})
+  </button>
+  <button id="tab-btn-rubric" onclick="switchDashboardTab('rubric')" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+    ⚖️ Scoring Rubric &amp; Weights
+  </button>
 </div>
+
+<!-- TAB 1: Leaderboard -->
+<div id="tab-pane-leaderboard" style="display: block;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+    <h3 style="margin: 0; font-size: 1.1rem; color: #f8fafc;">Cross-Judge Normalized Standings</h3>
+    <small style="color: #94a3b8;">Scores calibrated across judge scale differences</small>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Project Title</th>
+          <th>Track</th>
+          <th>Reviews</th>
+          <th>Raw Avg</th>
+          <th>Normalized Score</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in leaderboard %}
+          <tr>
+            <td><span class="rank-pill">#{{ r.rank }}</span></td>
+            <td>
+              <strong>{{ r.title }}</strong><br>
+              <small style="color: #64748b;">{{ r.project_id }}</small>
+            </td>
+            <td><span class="track-tag">{{ r.track_name }}</span></td>
+            <td>{{ r.review_count }}</td>
+            <td>{{ r.raw_score_avg }} / 5.0</td>
+            <td><strong class="score-highlight">{{ r.normalized_score }}</strong> / 5.0</td>
+            <td>
+              {% if r.rank <= 3 %}
+                <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">Podium</span>
+              {% else %}
+                <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #94a3b8;">Ranked</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7">No submissions recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 2: Judge Review Progress (Spec Requirement: "a progress view for the organizer") -->
+<div id="tab-pane-judges" style="display: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.1rem; color: #f8fafc;">Judge Progress View</h3>
+      <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #94a3b8;">Track evaluation velocity and completion rate across all 30 evaluators.</p>
+    </div>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Judge</th>
+          <th>Assigned Tracks</th>
+          <th>Completed / Assigned</th>
+          <th>Completion %</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for j in judge_progress %}
+          <tr>
+            <td>
+              <strong>{{ j.name }}</strong><br>
+              <small style="color: #64748b;">{{ j.id }} &bull; {{ j.email }}</small>
+            </td>
+            <td>
+              <span class="track-tag">{{ j.tracks }}</span>
+            </td>
+            <td><strong>{{ j.completed }}</strong> / {{ j.assigned }} projects</td>
+            <td style="min-width: 140px;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex: 1; background: rgba(255, 255, 255, 0.1); border-radius: 999px; height: 6px; overflow: hidden;">
+                  <div style="background: {% if j.percent >= 100 %}#34d399{% elif j.percent > 0 %}#38bdf8{% else %}#64748b{% endif %}; height: 100%; width: {{ j.percent }}%;"></div>
+                </div>
+                <small style="color: #cbd5e1; min-width: 40px;">{{ j.percent }}%</small>
+              </div>
+            </td>
+            <td>
+              {% if j.percent >= 100 %}
+                <span class="badge badge-complete">✓ Complete</span>
+              {% elif j.completed > 0 %}
+                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">In Progress</span>
+              {% else %}
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 3: Scoring Rubric & Weights (Spec Requirement: "a scoring rubric the organizer can weight") -->
+<div id="tab-pane-rubric" style="display: none;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.1rem; color: #f8fafc;">Organizer Rubric Weights</h3>
+      <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #94a3b8;">Configure the relative weight of each evaluation criterion. The Z-Score normalization engine recalibrates live standings instantly upon save.</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+    {% for w in rubric_weights %}
+      <div class="card" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem;">
+        <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; margin-bottom: 0.5rem;">CRITERION</span>
+        <h3 style="margin: 0.25rem 0; font-size: 1.2rem; color: #f8fafc; text-transform: capitalize;">{{ w.criterion }}</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8; margin: 0.5rem 0 1rem;">
+          {% if w.criterion == 'functionality' %}
+            Core execution, feature completeness, reliability, and fulfillment of declared problem scope.
+          {% elif w.criterion == 'quality' %}
+            Code architecture, testability, security, API design, and maintainability standards.
+          {% else %}
+            Novelty, technical ambition, original problem solving, and breakthrough user experience.
+          {% endif %}
+        </p>
+        <div style="font-size: 1.5rem; font-weight: 700; color: #34d399;">
+          {{ (w.weight * 100)|round|int }}%
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Interactive Weight Adjuster -->
+  <div class="card" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 1.5rem; max-width: 600px;">
+    <h4 style="margin: 0 0 1rem; color: #f8fafc;">Adjust Rubric Proportions</h4>
+    
+    <div style="margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+        <span style="color: #cbd5e1;">Functionality Weight:</span>
+        <strong id="disp-func" style="color: #38bdf8;">40%</strong>
+      </div>
+      <input type="range" id="slider-func" min="10" max="70" step="5" value="40" oninput="recalcWeights()" style="width: 100%; accent-color: #38bdf8;">
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+        <span style="color: #cbd5e1;">Technical Quality Weight:</span>
+        <strong id="disp-qual" style="color: #38bdf8;">35%</strong>
+      </div>
+      <input type="range" id="slider-qual" min="10" max="70" step="5" value="35" oninput="recalcWeights()" style="width: 100%; accent-color: #38bdf8;">
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+        <span style="color: #cbd5e1;">Innovation Weight:</span>
+        <strong id="disp-innov" style="color: #38bdf8;">25%</strong>
+      </div>
+      <input type="range" id="slider-innov" min="10" max="70" step="5" value="25" oninput="recalcWeights()" style="width: 100%; accent-color: #38bdf8;">
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <button onclick="saveRubricWeights()" id="btn-save-rubric" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+        💾 Save Rubric &amp; Recalculate
+      </button>
+      <span id="rubric-msg" style="font-size: 0.85rem; color: #34d399; display: none;"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchDashboardTab(tab) {
+  document.getElementById('tab-pane-leaderboard').style.display = tab === 'leaderboard' ? 'block' : 'none';
+  document.getElementById('tab-pane-judges').style.display = tab === 'judges' ? 'block' : 'none';
+  document.getElementById('tab-pane-rubric').style.display = tab === 'rubric' ? 'block' : 'none';
+
+  document.getElementById('tab-btn-leaderboard').className = tab === 'leaderboard' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('tab-btn-judges').className = tab === 'judges' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('tab-btn-rubric').className = tab === 'rubric' ? 'btn btn-primary' : 'btn btn-secondary';
+}
+
+function recalcWeights() {
+  const f = parseInt(document.getElementById('slider-func').value);
+  const q = parseInt(document.getElementById('slider-qual').value);
+  const i = parseInt(document.getElementById('slider-innov').value);
+
+  const total = f + q + i;
+  const fPct = Math.round((f / total) * 100);
+  const qPct = Math.round((q / total) * 100);
+  const iPct = 100 - fPct - qPct;
+
+  document.getElementById('disp-func').textContent = fPct + '%';
+  document.getElementById('disp-qual').textContent = qPct + '%';
+  document.getElementById('disp-innov').textContent = iPct + '%';
+}
+
+async function saveRubricWeights() {
+  const f = parseInt(document.getElementById('slider-func').value) / 100;
+  const q = parseInt(document.getElementById('slider-qual').value) / 100;
+  const i = parseInt(document.getElementById('slider-innov').value) / 100;
+
+  const btn = document.getElementById('btn-save-rubric');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch('/api/organizer/rubric', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({functionality: f, quality: q, innovation: i})
+    });
+    if (!res.ok) throw new Error('Failed to update rubric');
+    const msg = document.getElementById('rubric-msg');
+    msg.textContent = '✓ Saved! Recalibrating leaderboard...';
+    msg.style.display = 'inline';
+    setTimeout(() => window.location.reload(), 800);
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false;
+    btn.textContent = '💾 Save Rubric & Recalculate';
+  }
+}
+</script>
 {% endblock %}

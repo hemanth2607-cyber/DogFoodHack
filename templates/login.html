@@ -1,61 +1,117 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In &amp; Role Switcher — DOGFOOD 2026{% endblock %}
+{% block title %}Authentication &amp; Persona Gateway — DOGFOOD 2026{% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
-  <div class="login-card">
-    <div class="login-header">
-      <span class="logo-badge">DOGFOOD</span>
-      <h2>Portal Role Switcher</h2>
-      <p>Select a test persona or log in to access role-restricted portals.</p>
+<div class="login-wrapper" style="max-width: 900px; margin: 2rem auto; padding: 0 1rem;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <span class="logo-badge" style="font-size: 0.85rem; padding: 0.25rem 0.75rem; letter-spacing: 0.1em;">DOGFOOD 2026</span>
+    <h1 style="margin: 0.75rem 0 0.5rem; font-size: 2rem; color: #f8fafc;">Role-Based Authentication Gateway</h1>
+    <p style="color: #94a3b8; max-width: 650px; margin: 0 auto; line-height: 1.5; font-size: 0.95rem;">
+      In production, hackathon users log in via secure credentials. For testing and competition evaluation, select one of the seeded personas below to experience the platform through that role's isolated view:
+    </p>
+  </div>
+
+  {% if message %}
+    <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.85rem 1.25rem; color: #fde68a; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem;">
+      ℹ️ {{ message }}
     </div>
+  {% endif %}
 
-    {% if message %}
-      <div class="alert-info">{{ message }}</div>
-    {% endif %}
-
-    <div class="role-grid">
-      <a href="/login/switch?role=organizer&redirect={{ redirect_url }}" class="role-card role-org">
-        <div class="role-icon">&#128081;</div>
-        <div class="role-info">
-          <h3>Lead Organizer</h3>
-          <span class="role-token">Cookie: session=org_7f2a</span>
-          <p>Access live progress dashboard, rubric configuration, and normalized CSV export.</p>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+    
+    <!-- Lead Organizer -->
+    <a href="/login/switch?role=organizer&redirect={{ redirect_url }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 1.5rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.75rem;">👑</span>
+            <span class="badge role-organizer">ORGANIZER</span>
+          </div>
+          <h3 style="margin: 0 0 0.5rem; color: #f8fafc; font-size: 1.2rem;">Lead Organizer</h3>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 1rem;">
+            Full administrative access. Inspect the live judge progress tracker, adjust rubric weights, and download the official normalized CSV export.
+          </p>
         </div>
-      </a>
-
-      <a href="/login/switch?role=judge_a&redirect={{ redirect_url }}" class="role-card role-jdg">
-        <div class="role-icon">&#9878;&#65039;</div>
-        <div class="role-info">
-          <h3>Judge A (Tomas Varga)</h3>
-          <span class="role-token">Cookie: session=jdg_a_91bc</span>
-          <p>Score assigned projects, adjust criteria sliders, and submit feedback.</p>
+        <div style="padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.45rem 0; text-align: center; display: block; background: #fbbf24; color: #0f172a; border: none; font-weight: 600;">
+            Enter as Organizer &rarr;
+          </span>
         </div>
-      </a>
+      </div>
+    </a>
 
-      <a href="/login/switch?role=judge_b&redirect={{ redirect_url }}" class="role-card role-jdg">
-        <div class="role-icon">&#9878;&#65039;</div>
-        <div class="role-info">
-          <h3>Judge B (Reviewer 2)</h3>
-          <span class="role-token">Cookie: session=jdg_b_44de</span>
-          <p>Independent judge account to test peer score isolation defense.</p>
+    <!-- Judge A -->
+    <a href="/login/switch?role=judge_a&redirect={{ redirect_url }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 1.5rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.75rem;">⚖️</span>
+            <span class="badge role-judge">JUDGE A</span>
+          </div>
+          <h3 style="margin: 0 0 0.25rem; color: #f8fafc; font-size: 1.2rem;">Tomas Varga</h3>
+          <span class="track-tag" style="margin-bottom: 0.5rem; display: inline-block;">Track: Accessibility</span>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 1rem;">
+            Primary judge persona. Evaluates assigned submissions in a private enclave using the offline AI Rubric Co-Pilot and interactive sliders.
+          </p>
         </div>
-      </a>
-
-      <a href="/login/switch?role=participant&redirect={{ redirect_url }}" class="role-card role-prt">
-        <div class="role-icon">&#128187;</div>
-        <div class="role-info">
-          <h3>Participant Hacker</h3>
-          <span class="role-token">Cookie: session=prt_2e88</span>
-          <p>Submit projects and manage team memberships (enforces deadline locks).</p>
+        <div style="padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.45rem 0; text-align: center; display: block; font-weight: 600;">
+            Enter as Judge A &rarr;
+          </span>
         </div>
-      </a>
-    </div>
+      </div>
+    </a>
 
-    <div class="login-footer">
-      <a href="/logout" class="btn btn-secondary">Clear Session (Browse as Public Visitor)</a>
-    </div>
+    <!-- Judge B (Peer) -->
+    <a href="/login/switch?role=judge_b&redirect={{ redirect_url }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px; padding: 1.5rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.75rem;">🔍</span>
+            <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">PEER JUDGE</span>
+          </div>
+          <h3 style="margin: 0 0 0.25rem; color: #f8fafc; font-size: 1.2rem;">Wei Lindqvist</h3>
+          <span class="track-tag" style="margin-bottom: 0.5rem; display: inline-block;">Tracks: Security, Analytics</span>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 1rem;">
+            Independent reviewer persona. Used to verify the competition's critical backend peer isolation test (attempting to view Judge A's scores returns HTTP 403).
+          </p>
+        </div>
+        <div style="padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; padding: 0.45rem 0; text-align: center; display: block; border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
+            Enter as Peer Judge &rarr;
+          </span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Participant Hacker -->
+    <a href="/login/switch?role=participant&redirect={{ redirect_url }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 12px; padding: 1.5rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.75rem;">💻</span>
+            <span class="badge role-participant">PARTICIPANT</span>
+          </div>
+          <h3 style="margin: 0 0 0.5rem; color: #f8fafc; font-size: 1.2rem;">Hacker Hacker</h3>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 1rem;">
+            Hackathon team member persona. Demonstrates that participants cannot access judging scores and verifies post-deadline submission refusal (HTTP 403).
+          </p>
+        </div>
+        <div style="padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; padding: 0.45rem 0; text-align: center; display: block; border-color: rgba(52, 211, 153, 0.4); color: #34d399;">
+            Enter as Participant &rarr;
+          </span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+    <a href="/logout" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1.25rem;">
+      Browse as Public Guest (Unauthenticated)
+    </a>
   </div>
 </div>
 {% endblock %}

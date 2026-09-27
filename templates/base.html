@@ -16,16 +16,20 @@
       <nav class="nav-links">
         <a href="/projects" class="nav-item">Gallery</a>
         <a href="/projects/new" class="nav-item">Submit</a>
-        <a href="/judge" class="nav-item">Judge View</a>
-        <a href="/organizer" class="nav-item">Dashboard</a>
+        {% if user and user.is_judge() %}
+          <a href="/judge" class="nav-item" style="color: #38bdf8; font-weight: 600;">⭐ Scoring Workspace</a>
+        {% elif user and user.is_organizer() %}
+          <a href="/organizer" class="nav-item" style="color: #fbbf24; font-weight: 600;">👑 Organizer Command Center</a>
+        {% endif %}
       </nav>
       <div class="user-pill">
         {% if user %}
-          <a href="/login" class="badge role-{{ user.role }}" title="Click to switch role">{{ user.role|upper }}</a>
-          <span class="username">{{ user.name }}</span>
-          <a href="/logout" class="nav-item logout-link" style="margin-left: 0.5rem; font-size: 0.8rem; color: #ef4444;">Logout</a>
+          <span class="badge role-{{ user.role }}">{{ user.role|upper }}</span>
+          <span class="username" style="font-weight: 500;">{{ user.name }}</span>
+          <a href="/login" class="nav-item" style="margin-left: 0.6rem; font-size: 0.8rem; color: #94a3b8;" title="Switch demo persona">Switch Persona</a>
+          <a href="/logout" class="nav-item logout-link" style="margin-left: 0.4rem; font-size: 0.8rem; color: #ef4444;">Logout</a>
         {% else %}
-          <a href="/login" class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">Switch Role / Sign In</a>
+          <a href="/login" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">Sign In / Switch Persona</a>
         {% endif %}
       </div>
     </div>

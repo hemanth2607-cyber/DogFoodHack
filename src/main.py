@@ -430,6 +430,35 @@ def judge_ui(request: Request):
         }
     )
 
+class RubricUpdate(BaseModel):
+    functionality: float = 0.40
+    quality: float = 0.35
+    innovation: float = 0.25
+
+@app.post("/api/organizer/rubric")
+def update_rubric_weights(
+    payload: RubricUpdate,
+    current_user: AuthUser = Depends(require_organizer)
+):
+    """
+    Allows organizers to adjust the scoring rubric weights.
+    Recalibrates normalized scoring in real time.
+    """
+    total = payload.functionality + payload.quality + payload.innovation
+    if total <= 0:
+        raise HTTPException(status_code=400, detail="Total weights must be greater than zero")
+    
+    f = round(payload.functionality / total, 2)
+    q = round(payload.quality / total, 2)
+    i = round(1.0 - f - q, 2)
+
+    with get_db() as conn:
+        conn.execute("UPDATE rubric_weights SET weight = ? WHERE criterion = 'functionality'", (f,))
+        conn.execute("UPDATE rubric_weights SET weight = ? WHERE criterion = 'quality'", (q,))
+        conn.execute("UPDATE rubric_weights SET weight = ? WHERE criterion = 'innovation'", (i,))
+
+    return {"status": "success", "message": "Rubric weights updated successfully", "weights": {"functionality": f, "quality": q, "innovation": i}}
+
 # --- T2: ORGANIZER DASHBOARD & CSV EXPORT ---
 @app.get("/organizer", response_class=HTMLResponse)
 def organizer_dashboard(request: Request):
@@ -443,7 +472,48 @@ def organizer_dashboard(request: Request):
         total_projects = conn.execute("SELECT COUNT(*) as c FROM projects").fetchone()["c"]
         total_judges = conn.execute("SELECT COUNT(*) as c FROM users WHERE role = 'judge'").fetchone()["c"]
         total_scores = conn.execute("SELECT COUNT(*) as c FROM scores").fetchone()["c"]
-        
+        total_tracks = conn.execute("SELECT COUNT(*) as c FROM tracks").fetchone()["c"]
+
+        # 1. Rubric weights that the organizer can view & weight
+        weights_rows = conn.execute("SELECT criterion, weight FROM rubric_weights ORDER BY weight DESC").fetchall()
+        rubric_weights = [dict(w) for w in weights_rows]
+
+        # 2. Progress view for the organizer: all judges and their review completion
+        judges_rows = conn.execute("""
+            SELECT u.id, u.name, u.email,
+                   COUNT(DISTINCT s.project_id) as completed_reviews,
+                   GROUP_CONCAT(DISTINCT t.name) as tracks_str,
+                   GROUP_CONCAT(DISTINCT t.id) as track_ids_str
+            FROM users u
+            LEFT JOIN judge_tracks jt ON u.id = jt.judge_id
+            LEFT JOIN tracks t ON jt.track_id = t.id
+            LEFT JOIN scores s ON u.id = s.judge_id
+            WHERE u.role = 'judge'
+            GROUP BY u.id, u.name, u.email
+            ORDER BY completed_reviews DESC, u.name ASC
+        """).fetchall()
+
+        judge_progress = []
+        for j in judges_rows:
+            track_ids = [tid.strip() for tid in (j["track_ids_str"] or "").split(",") if tid.strip()]
+            if track_ids:
+                ph = ",".join("?" for _ in track_ids)
+                assigned_count = conn.execute(f"SELECT COUNT(*) as c FROM projects WHERE track_id IN ({ph})", track_ids).fetchone()["c"]
+            else:
+                assigned_count = total_projects
+            
+            comp = j["completed_reviews"]
+            pct = round((comp / assigned_count * 100), 1) if assigned_count > 0 else 100.0
+            judge_progress.append({
+                "id": j["id"],
+                "name": j["name"],
+                "email": j["email"],
+                "tracks": j["tracks_str"] or "All Tracks",
+                "completed": comp,
+                "assigned": assigned_count,
+                "percent": min(100.0, pct)
+            })
+
     leaderboard = get_normalized_scores()
     
     return templates.TemplateResponse(
@@ -454,8 +524,11 @@ def organizer_dashboard(request: Request):
             "stats": {
                 "total_projects": total_projects,
                 "total_judges": total_judges,
-                "total_scores": total_scores
+                "total_scores": total_scores,
+                "total_tracks": total_tracks
             },
+            "rubric_weights": rubric_weights,
+            "judge_progress": judge_progress,
             "leaderboard": leaderboard
         }
     )
