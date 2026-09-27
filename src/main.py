@@ -25,19 +25,23 @@ from src.normalization import get_normalized_scores, get_judge_severity_profiles
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 app = FastAPI(
     title="DOGFOOD 2026 Hackathon Platform",
     description="Self-hostable hackathon submission and judging platform with backend peer isolation and z-score normalization.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Static and Templates
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
-
-@app.on_event("startup")
-def on_startup():
-    init_db()
 
 @app.get("/", include_in_schema=False)
 def root():
