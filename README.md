@@ -37,20 +37,31 @@ The entire platform runs offline on a local laptop with **zero cloud accounts, z
 ```bash
 docker compose up --build
 ```
+*(Or simply run `make up`)*
 
 The portal automatically initializes the embedded SQLite database, ingests the official [`fixtures.json`](file:///c:/Users/heman/Desktop/dogfood/fixtures.json) dataset (41 projects, 30 judges, 8 tracks, 126 reviews), prints test login headers, and serves on:
 
 **`http://localhost:8080`**
 
-### Running the Acceptance Checker
+### Evaluator Quick Commands (`Makefile`)
+| Command | Description |
+| :--- | :--- |
+| `make up` | Launches portal container via Docker Compose (`docker compose up --build`) |
+| `make check` | Runs official acceptance checker (`python run.py .dogfood.toml`) |
+| `make test` | Runs the full 15-test pytest suite (`pytest tests/test_platform.py -v`) |
+| `make math` | Runs the standalone mathematical normalization audit in the terminal |
+| `make report` | Re-generates [acceptance-report.txt](file:///c:/Users/heman/Desktop/dogfood/acceptance-report.txt) |
+
+### Standalone Normalization CLI
+To inspect the mathematical normalization engine and judge severity profiling directly in your terminal:
 ```bash
-python run.py .dogfood.toml
+python src/normalization.py
 ```
 
-### Running the Test Suite
-```bash
-python -m pytest tests/test_platform.py -v
-```
+### Interactive API Documentation
+Once running, explore the auto-generated OpenAPI specification:
+* **Swagger UI:** [http://localhost:8080/docs](http://localhost:8080/docs)
+* **ReDoc:** [http://localhost:8080/redoc](http://localhost:8080/redoc)
 
 ---
 
