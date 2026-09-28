@@ -15,6 +15,10 @@ In any competitive hackathon, three fundamental mathematical biases distort raw 
 
 ## 2. Our Multi-Layer Normalization Pipeline
 
+<p align="center">
+  <img src="./docs/judging-pipeline.svg" alt="DOGFOOD 2026 Mathematical Normalization Pipeline" width="100%">
+</p>
+
 ### Step 1: Weighted Rubric Aggregation
 For review $k$ by judge $j$ on project $i$:
 $$s_{ij} = \frac{\sum_{c} w_c \cdot x_{ijc}}{\sum_c w_c}$$

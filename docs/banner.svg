@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="100%" height="auto">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117" />
+      <stop offset="50%" stop-color="#161b22" />
+      <stop offset="100%" stop-color="#0a0d12" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e3b341" />
+      <stop offset="50%" stop-color="#f2cc60" />
+      <stop offset="100%" stop-color="#d29922" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2ea043" />
+      <stop offset="100%" stop-color="#3fb950" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1f6feb" />
+      <stop offset="100%" stop-color="#58a6ff" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#21262d" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#161b22" stop-opacity="0.9" />
+    </linearGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#30363d" stroke-width="0.5" stroke-opacity="0.4" />
+    </pattern>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="360" rx="16" fill="url(#bgGrad)" stroke="#30363d" stroke-width="1.5" />
+  <rect width="1200" height="360" rx="16" fill="url(#grid)" />
+
+  <!-- Ambient Glow Circles -->
+  <circle cx="180" cy="80" r="160" fill="#238636" opacity="0.08" filter="url(#glow)" />
+  <circle cx="1020" cy="180" r="180" fill="#1f6feb" opacity="0.08" filter="url(#glow)" />
+  <circle cx="600" cy="30" r="140" fill="#d29922" opacity="0.06" filter="url(#glow)" />
+
+  <!-- Top Status Pill -->
+  <g transform="translate(60, 42)">
+    <rect width="280" height="28" rx="14" fill="#21262d" stroke="#388bfd" stroke-opacity="0.4" />
+    <circle cx="14" cy="14" r="5" fill="#3fb950">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <text x="28" y="18" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="600" letter-spacing="0.8">DOGFOOD 2026 · HACKATHON RAPTORS</text>
+  </g>
+
+  <!-- Title & Headline -->
+  <text x="60" y="125" fill="#f0f6fc" font-family="Georgia, serif" font-size="44" font-weight="bold" letter-spacing="-0.5">
+    DOGFOOD 2026
+  </text>
+  <text x="440" y="125" fill="url(#goldGrad)" font-family="Georgia, serif" font-size="44" font-weight="normal" font-style="italic">
+    Judging &amp; Evaluation Platform
+  </text>
+
+  <!-- Subtitle Tagline -->
+  <text x="60" y="162" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="16" font-weight="400">
+    Self-hostable, 100% offline hackathon portal engineered for backend peer isolation, Z-score normalization, and Merkle score provenance.
+  </text>
+
+  <!-- 4 Feature KPI Cards -->
+  <!-- Card 1: Acceptance -->
+  <g transform="translate(60, 195)">
+    <rect width="250" height="115" rx="10" fill="url(#cardGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="4" height="115" rx="2" fill="#2ea043" />
+    <text x="20" y="32" fill="#3fb950" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5">ACCEPTANCE VERIFIED</text>
+    <text x="20" y="66" fill="#f0f6fc" font-family="Georgia, serif" font-size="28" font-weight="bold">7 / 7 PASS</text>
+    <text x="20" y="92" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Claimed T1 + T2 · 0 Penalties</text>
+  </g>
+
+  <!-- Card 2: Judging Normalization -->
+  <g transform="translate(330, 195)">
+    <rect width="255" height="115" rx="10" fill="url(#cardGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="4" height="115" rx="2" fill="#e3b341" />
+    <text x="20" y="32" fill="#f2cc60" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5">NORMALIZATION ENGINE</text>
+    <text x="20" y="66" fill="#f0f6fc" font-family="Georgia, serif" font-size="28" font-weight="bold">Z-Score + Bayes</text>
+    <text x="20" y="92" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">σ=0.0 Guard · Rater Bias Offset</text>
+  </g>
+
+  <!-- Card 3: Peer Isolation -->
+  <g transform="translate(605, 195)">
+    <rect width="255" height="115" rx="10" fill="url(#cardGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="4" height="115" rx="2" fill="#58a6ff" />
+    <text x="20" y="32" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5">BACKEND PEER SHIELD</text>
+    <text x="20" y="66" fill="#f0f6fc" font-family="Georgia, serif" font-size="28" font-weight="bold">HTTP 403 Hard</text>
+    <text x="20" y="92" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Enforced Before DB Queries</text>
+  </g>
+
+  <!-- Card 4: Operability -->
+  <g transform="translate(880, 195)">
+    <rect width="260" height="115" rx="10" fill="url(#cardGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="4" height="115" rx="2" fill="#bc8cff" />
+    <text x="20" y="32" fill="#d2a8ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5">AIR-GAPPED OPERABILITY</text>
+    <text x="20" y="66" fill="#f0f6fc" font-family="Georgia, serif" font-size="28" font-weight="bold">100% Offline</text>
+    <text x="20" y="92" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Zero External Fonts · Zero CDN</text>
+  </g>
+</svg>

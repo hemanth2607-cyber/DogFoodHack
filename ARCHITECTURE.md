@@ -21,6 +21,10 @@ The platform is designed around four foundational architectural tenets:
 
 ## 2. High-Level Component & Layering Diagram
 
+<p align="center">
+  <img src="./docs/system-architecture.svg" alt="DOGFOOD 2026 End-to-End System Architecture" width="100%">
+</p>
+
 ```text
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
  │                              PRESENTATION & CLIENT LAYER                               │

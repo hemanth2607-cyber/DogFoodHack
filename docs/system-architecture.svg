@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="100%" height="auto">
+  <defs>
+    <linearGradient id="archBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d13" />
+      <stop offset="50%" stop-color="#121820" />
+      <stop offset="100%" stop-color="#0a0e14" />
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#58a6ff" />
+      <stop offset="100%" stop-color="#79c0ff" />
+    </linearGradient>
+    <linearGradient id="layerBoxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#161b22" />
+      <stop offset="100%" stop-color="#0d1117" />
+    </linearGradient>
+    <filter id="boxShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3fb950" />
+    </marker>
+    <marker id="arrowGold" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#e3b341" />
+    </marker>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="700" rx="16" fill="url(#archBg)" stroke="#30363d" stroke-width="1.5" />
+
+  <!-- Title Area -->
+  <g transform="translate(60, 40)">
+    <text x="0" y="0" fill="#f0f6fc" font-family="Georgia, serif" font-size="26" font-weight="bold">
+      DOGFOOD 2026 — End-to-End System &amp; Security Architecture
+    </text>
+    <text x="0" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13">
+      Zero-Cloud Offline Pipeline: Request Authentication, Role-Based Access Barriers, Mathematical Judging, and SQLite WAL Persistence
+    </text>
+  </g>
+
+  <!-- ================= LAYER 1: CLIENTS & RUNNERS ================= -->
+  <g transform="translate(60, 95)">
+    <!-- Container Box -->
+    <rect width="1080" height="90" rx="10" fill="url(#layerBoxGrad)" stroke="#30363d" filter="url(#boxShadow)" />
+    <rect x="0" y="0" width="1080" height="26" rx="10" fill="#21262d" />
+    <rect x="0" y="16" width="1080" height="10" fill="#21262d" />
+    <text x="20" y="18" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold" letter-spacing="0.5">LAYER 1: CLIENT RUNTIMES &amp; EVALUATION ROLES</text>
+
+    <!-- Client Pills -->
+    <!-- Public Guest -->
+    <g transform="translate(25, 40)">
+      <rect width="180" height="36" rx="6" fill="#0d1117" stroke="#30363d" />
+      <circle cx="16" cy="18" r="4" fill="#8b949e" />
+      <text x="28" y="22" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="600">Public Guest (/projects)</text>
+    </g>
+
+    <!-- Participant -->
+    <g transform="translate(225, 40)">
+      <rect width="195" height="36" rx="6" fill="#0d1117" stroke="#30363d" />
+      <circle cx="16" cy="18" r="4" fill="#a371f7" />
+      <text x="28" y="22" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="600">Participant (prt_2e88)</text>
+    </g>
+
+    <!-- Judge Enclave -->
+    <g transform="translate(440, 40)">
+      <rect width="210" height="36" rx="6" fill="#0d1117" stroke="#388bfd" stroke-width="1.5" />
+      <circle cx="16" cy="18" r="4" fill="#58a6ff" />
+      <text x="28" y="22" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="600">Judge A &amp; B (jdg_a / jdg_b)</text>
+    </g>
+
+    <!-- Organizer -->
+    <g transform="translate(670, 40)">
+      <rect width="190" height="36" rx="6" fill="#0d1117" stroke="#d29922" stroke-width="1.5" />
+      <circle cx="16" cy="18" r="4" fill="#e3b341" />
+      <text x="28" y="22" fill="#f2cc60" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="600">Organizer (org_7f2a)</text>
+    </g>
+
+    <!-- Automated Harness -->
+    <g transform="translate(880, 40)">
+      <rect width="175" height="36" rx="6" fill="#1b4728" stroke="#3fb950" stroke-width="1.5" />
+      <circle cx="16" cy="18" r="4" fill="#3fb950" />
+      <text x="28" y="22" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="bold">run.py .dogfood.toml</text>
+    </g>
+  </g>
+
+  <!-- Connecting Lines 1 -> 2 -->
+  <line x1="600" y1="185" x2="600" y2="218" stroke="#58a6ff" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+
+  <!-- ================= LAYER 2: CONTROLLER & SECURITY BARRIER ================= -->
+  <g transform="translate(60, 225)">
+    <rect width="1080" height="120" rx="10" fill="url(#layerBoxGrad)" stroke="#388bfd" stroke-width="1.5" filter="url(#boxShadow)" />
+    <rect x="0" y="0" width="1080" height="26" rx="10" fill="#1f3554" />
+    <rect x="0" y="16" width="1080" height="10" fill="#1f3554" />
+    <text x="20" y="18" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold" letter-spacing="0.5">LAYER 2: APPLICATION CONTROLLER &amp; SECURITY ISOLATION BARRIER (FASTAPI :8080)</text>
+
+    <!-- 3 Internal Security Modules -->
+    <!-- Module 1: Session Auth -->
+    <g transform="translate(25, 42)">
+      <rect width="325" height="62" rx="8" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Session Extractor (Cookie / Header)</text>
+      <text x="16" y="46" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">Parses session token &amp; resolves AuthUser role</text>
+    </g>
+
+    <!-- Module 2: Deadline Clock -->
+    <g transform="translate(375, 42)">
+      <rect width="330" height="62" rx="8" fill="#0d1117" stroke="#f85149" stroke-opacity="0.6" />
+      <text x="16" y="26" fill="#ff7b72" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Atomic Deadline Guard (T1)</text>
+      <text x="16" y="46" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">now &gt; submissions_close -&gt; Refuses with HTTP 403</text>
+    </g>
+
+    <!-- Module 3: Peer Isolation Shield -->
+    <g transform="translate(730, 42)">
+      <rect width="325" height="62" rx="8" fill="#0d1117" stroke="#3fb950" stroke-opacity="0.6" />
+      <text x="16" y="26" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Peer Score Shield (T2 Core)</text>
+      <text x="16" y="46" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">Judge B viewing Judge A -&gt; Refuses with HTTP 403</text>
+    </g>
+  </g>
+
+  <!-- Connecting Lines 2 -> 3 -->
+  <line x1="600" y1="345" x2="600" y2="378" stroke="#3fb950" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrowGreen)" />
+
+  <!-- ================= LAYER 3: DOMAIN ENGINES ================= -->
+  <g transform="translate(60, 385)">
+    <rect width="1080" height="145" rx="10" fill="url(#layerBoxGrad)" stroke="#238636" stroke-width="1.5" filter="url(#boxShadow)" />
+    <rect x="0" y="0" width="1080" height="26" rx="10" fill="#1b4728" />
+    <rect x="0" y="16" width="1080" height="10" fill="#1b4728" />
+    <text x="20" y="18" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold" letter-spacing="0.5">LAYER 3: CORE DOMAIN ENGINES &amp; MATHEMATICAL AUDITING</text>
+
+    <!-- Sub-engine 1: Normalization -->
+    <g transform="translate(25, 42)">
+      <rect width="420" height="88" rx="8" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Z-Score Normalization Engine (src/normalization.py)</text>
+      <text x="16" y="48" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Eliminates rater bias (Δj) | Defends σ=0.0 on jdg_07</text>
+      <text x="16" y="66" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Empirical Bayes Shrinkage (K=1.0) | 95% CI Bounds [±1.96·SE]</text>
+    </g>
+
+    <!-- Sub-engine 2: Merkle Audit -->
+    <g transform="translate(470, 42)">
+      <rect width="320" height="88" rx="8" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Cryptographic Merkle Audit (/audit)</text>
+      <text x="16" y="48" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• SHA-256 block chain linking 126 reviews</text>
+      <text x="16" y="66" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Zero-Knowledge privacy masking for peers</text>
+    </g>
+
+    <!-- Sub-engine 3: Anti-Cheat Voting -->
+    <g transform="translate(815, 42)">
+      <rect width="240" height="88" rx="8" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#bc8cff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="bold">Anti-Cheat Voting</text>
+      <text x="16" y="48" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• IP + UA client fingerprint</text>
+      <text x="16" y="66" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Strict 1-vote limit (409 Conflict)</text>
+    </g>
+  </g>
+
+  <!-- Connecting Lines 3 -> 4 -->
+  <line x1="600" y1="530" x2="600" y2="563" stroke="#e3b341" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrowGold)" />
+
+  <!-- ================= LAYER 4: PERSISTENCE SUBSYSTEM ================= -->
+  <g transform="translate(60, 570)">
+    <rect width="1080" height="95" rx="10" fill="url(#layerBoxGrad)" stroke="#d29922" stroke-width="1.5" filter="url(#boxShadow)" />
+    <rect x="0" y="0" width="1080" height="26" rx="10" fill="#4d3800" />
+    <rect x="0" y="16" width="1080" height="10" fill="#4d3800" />
+    <text x="20" y="18" fill="#f2cc60" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold" letter-spacing="0.5">LAYER 4: PERSISTENCE &amp; OPTIMIZED SQLITE SUBSYSTEM (WAL MODE · 6.5ms LATENCY)</text>
+
+    <g transform="translate(25, 40)">
+      <rect width="320" height="42" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#f0f6fc" font-family="monospace" font-size="11">PRAGMA journal_mode = WAL;</text>
+    </g>
+    <g transform="translate(370, 40)">
+      <rect width="330" height="42" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#f0f6fc" font-family="monospace" font-size="11">PRAGMA cache_size = -64000; (64MB RAM)</text>
+    </g>
+    <g transform="translate(725, 40)">
+      <rect width="330" height="42" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="16" y="26" fill="#f0f6fc" font-family="monospace" font-size="11">8 Compound B-Tree Indexes Created</text>
+    </g>
+  </g>
+</svg>

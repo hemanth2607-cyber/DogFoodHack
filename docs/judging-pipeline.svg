@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="100%" height="auto">
+  <defs>
+    <linearGradient id="pipeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e14" />
+      <stop offset="50%" stop-color="#121720" />
+      <stop offset="100%" stop-color="#090d13" />
+    </linearGradient>
+    <linearGradient id="stepGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c2128" />
+      <stop offset="100%" stop-color="#161b22" />
+    </linearGradient>
+    <marker id="stepArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#e3b341" />
+    </marker>
+  </defs>
+
+  <rect width="1200" height="440" rx="16" fill="url(#pipeBg)" stroke="#30363d" stroke-width="1.5" />
+
+  <!-- Header -->
+  <g transform="translate(60, 42)">
+    <text x="0" y="0" fill="#f0f6fc" font-family="Georgia, serif" font-size="24" font-weight="bold">
+      DOGFOOD 2026 — Mathematical Normalization &amp; Bias Elimination Pipeline
+    </text>
+    <text x="0" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13">
+      How the engine transforms raw biased ratings into fair, calibrated leaderboard standings with 95% Confidence Bounds
+    </text>
+  </g>
+
+  <!-- 4 Pipeline Steps -->
+  <!-- Step 1 -->
+  <g transform="translate(60, 95)">
+    <rect width="245" height="295" rx="10" fill="url(#stepGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="245" height="32" rx="10" fill="#21262d" />
+    <rect x="0" y="20" width="245" height="12" fill="#21262d" />
+    <text x="16" y="21" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">STEP 1: RUBRIC AGGREGATION</text>
+    <text x="16" y="65" fill="#f0f6fc" font-family="Georgia, serif" font-size="16" font-weight="bold">Weighted Composite</text>
+    <text x="16" y="90" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Combines organizer criteria:</text>
+    
+    <g transform="translate(16, 110)">
+      <rect width="213" height="50" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="10" y="22" fill="#e3b341" font-family="monospace" font-size="11">s_ij = Σ(w_c · x_c) / Σw_c</text>
+      <text x="10" y="40" fill="#8b949e" font-family="monospace" font-size="10">Func 40% · Qual 35% · Innov 25%</text>
+    </g>
+    <text x="16" y="195" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">
+      Produces baseline score for review j on project i before standardization.
+    </text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <line x1="315" y1="240" x2="335" y2="240" stroke="#e3b341" stroke-width="2" marker-end="url(#stepArrow)" />
+
+  <!-- Step 2 -->
+  <g transform="translate(345, 95)">
+    <rect width="245" height="295" rx="10" fill="url(#stepGrad)" stroke="#30363d" />
+    <rect x="0" y="0" width="245" height="32" rx="10" fill="#21262d" />
+    <rect x="0" y="20" width="245" height="12" fill="#21262d" />
+    <text x="16" y="21" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">STEP 2: RATER PROFILING</text>
+    <text x="16" y="65" fill="#f0f6fc" font-family="Georgia, serif" font-size="16" font-weight="bold">Judge Distribution</text>
+    <text x="16" y="90" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Quantifies evaluator bias:</text>
+    
+    <g transform="translate(16, 110)">
+      <rect width="213" height="50" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="10" y="22" fill="#58a6ff" font-family="monospace" font-size="11">μ_j = (1/N)Σs_ij</text>
+      <text x="10" y="40" fill="#58a6ff" font-family="monospace" font-size="11">Δ_j = μ_j - μ_global</text>
+    </g>
+    <text x="16" y="185" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">
+      Classification:
+    </text>
+    <text x="16" y="205" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Lenient: Δ &gt; +0.25</text>
+    <text x="16" y="223" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Strict: Δ &lt; -0.25</text>
+    <text x="16" y="241" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">• Balanced: |Δ| ≤ 0.25</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <line x1="600" y1="240" x2="620" y2="240" stroke="#e3b341" stroke-width="2" marker-end="url(#stepArrow)" />
+
+  <!-- Step 3 -->
+  <g transform="translate(630, 95)">
+    <rect width="245" height="295" rx="10" fill="url(#stepGrad)" stroke="#388bfd" />
+    <rect x="0" y="0" width="245" height="32" rx="10" fill="#1f3554" />
+    <rect x="0" y="20" width="245" height="12" fill="#1f3554" />
+    <text x="16" y="21" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">STEP 3: ZERO-VAR &amp; Z-SCORE</text>
+    <text x="16" y="65" fill="#f0f6fc" font-family="Georgia, serif" font-size="16" font-weight="bold">Standardization</text>
+    <text x="16" y="90" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Eliminates severity offsets:</text>
+    
+    <g transform="translate(16, 110)">
+      <rect width="213" height="65" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="10" y="20" fill="#ff7b72" font-family="monospace" font-size="10">if σ_j &lt; 1e-5: z = 0.0</text>
+      <text x="10" y="36" fill="#79c0ff" font-family="monospace" font-size="10">else: z = (s_ij - μ_j) / σ_j</text>
+      <text x="10" y="54" fill="#7ee787" font-family="monospace" font-size="10">S_norm = μ_g + z · σ_g</text>
+    </g>
+    <text x="16" y="200" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">Zero-Variance Defense:</text>
+    <text x="16" y="220" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">Protects against uniform 4.0 ratings on jdg_07 without zero-division crashes.</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <line x1="885" y1="240" x2="905" y2="240" stroke="#e3b341" stroke-width="2" marker-end="url(#stepArrow)" />
+
+  <!-- Step 4 -->
+  <g transform="translate(915, 95)">
+    <rect width="225" height="295" rx="10" fill="url(#stepGrad)" stroke="#2ea043" />
+    <rect x="0" y="0" width="225" height="32" rx="10" fill="#1b4728" />
+    <rect x="0" y="20" width="225" height="12" fill="#1b4728" />
+    <text x="16" y="21" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">STEP 4: BAYES &amp; 95% CI</text>
+    <text x="16" y="65" fill="#f0f6fc" font-family="Georgia, serif" font-size="16" font-weight="bold">Final Podium</text>
+    <text x="16" y="90" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12">Stabilizes sparse reviews:</text>
+    
+    <g transform="translate(16, 110)">
+      <rect width="193" height="65" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="8" y="20" fill="#7ee787" font-family="monospace" font-size="10">S_final = (K·μ + ΣS)/(K + N)</text>
+      <text x="8" y="38" fill="#e3b341" font-family="monospace" font-size="10">Prior Weight: K = 1.0</text>
+      <text x="8" y="54" fill="#79c0ff" font-family="monospace" font-size="10">CI_95 = S_final ± 1.96·SE</text>
+    </g>
+    <text x="16" y="200" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">Deterministic Tie-Breaker:</text>
+    <text x="16" y="220" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11">Norm Score &gt; Tech Quality &gt; Consensus &gt; Volume</text>
+  </g>
+</svg>

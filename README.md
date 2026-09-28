@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/banner.svg" alt="DOGFOOD 2026 Platform Banner" width="100%">
+</p>
+
 # DOGFOOD 2026 — Submission & Judging Platform
 > *"Build the platform that will judge you."*
 
