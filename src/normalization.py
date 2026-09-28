@@ -1,6 +1,13 @@
+import os
+import sys
 import math
 import json
 from typing import Dict, List, Tuple, Any
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from src.db import get_db
 
 def compute_raw_score(criteria_dict: Dict[str, float], weights: Dict[str, float]) -> float:
@@ -246,3 +253,51 @@ def get_normalized_scores() -> List[Dict[str, Any]]:
         item["track_rank"] = track_counts[t_id]
 
     return results
+
+if __name__ == "__main__":
+    import sys
+    import os
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if BASE_DIR not in sys.path:
+        sys.path.insert(0, BASE_DIR)
+
+    print("=" * 80)
+    print(" DOGFOOD 2026 -- Mathematical Normalization Engine & Statistical Audit")
+    print("=" * 80)
+
+    with get_db() as conn:
+        judge_names = {row["id"]: row["name"] for row in conn.execute("SELECT id, name FROM users WHERE role = 'judge'")}
+
+    # 1. Judge Severity Profiling
+    profiles = get_judge_severity_profiles()
+    print(f"\n[1] Evaluator Severity Profiles ({len(profiles)} judges analyzed):")
+    print("-" * 80)
+    print(f"{'Judge ID':<10} {'Name':<22} {'Mean':<6} {'StdDev':<8} {'Delta':<8} {'Classification':<15}")
+    print("-" * 80)
+    for j_id, prof in sorted(profiles.items(), key=lambda x: -x[1]["mean"])[:8]:
+        delta_str = f"{prof['delta']:+0.2f}"
+        j_name = judge_names.get(j_id, j_id)
+        print(f"{j_id:<10} {j_name[:20]:<22} {prof['mean']:<6.2f} {prof['std']:<8.2f} {delta_str:<8} {prof['classification']:<15}")
+    print(f"... and {len(profiles) - 8} additional judges.")
+
+    # 2. Zero-Variance Defense Check
+    zero_var_judges = [p for p in profiles.values() if p["classification"] == "Zero-Variance"]
+    print("\n[2] Zero-Variance Edge Case Protection (std < 1e-5):")
+    for zv in zero_var_judges:
+        zv_id = zv["judge_id"]
+        zv_name = judge_names.get(zv_id, zv_id)
+        print(f"  * Protected: {zv_name} ({zv_id}) awarded uniform {zv['mean']:.1f} ratings across all reviews (std = {zv['std']:.4f}).")
+    print("  * Resolution: z-score set to 0.0 (event mean), preventing ZeroDivisionError crashes.")
+
+    # 3. Normalized Leaderboard Standings
+    ranked = get_normalized_scores()
+    print(f"\n[3] Normalized Podium Standings (Top 5 of {len(ranked)} Projects):")
+    print("-" * 80)
+    print(f"{'Rank':<5} {'Project Title':<24} {'Track':<18} {'Norm':<7} {'Raw':<7} {'95% CI Bounds':<16}")
+    print("-" * 80)
+    for p in ranked[:5]:
+        ci_str = f"[{p['ci_lower']:.2f}, {p['ci_upper']:.2f}]"
+        print(f"#{p['rank']:<4} {p['title'][:22]:<24} {p['track_name'][:16]:<18} {p['normalized_score']:<7.3f} {p['raw_score_avg']:<7.3f} {ci_str:<16}")
+    print("-" * 80)
+    print("Axiomatic Tie-Breaking: Normalized Score > Technical Quality > Consensus > Volume")
+    print("=" * 80 + "\n")
