@@ -6,9 +6,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.environ.get("DOGFOOD_DB_PATH", os.path.join(BASE_DIR, "dogfood.db"))
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=20.0)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA synchronous = NORMAL;")
+    conn.execute("PRAGMA cache_size = -64000;")
+    conn.execute("PRAGMA temp_store = MEMORY;")
     return conn
 
 @contextmanager
@@ -110,6 +114,16 @@ def init_db():
             ('functionality', 0.40),
             ('quality', 0.35),
             ('innovation', 0.25);
+
+        -- Performance Indexes
+        CREATE INDEX IF NOT EXISTS idx_projects_track ON projects(track_id);
+        CREATE INDEX IF NOT EXISTS idx_projects_submitted ON projects(submitted_at);
+        CREATE INDEX IF NOT EXISTS idx_scores_judge ON scores(judge_id);
+        CREATE INDEX IF NOT EXISTS idx_scores_project ON scores(project_id);
+        CREATE INDEX IF NOT EXISTS idx_users_token ON users(session_token);
+        CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+        CREATE INDEX IF NOT EXISTS idx_community_voter ON community_votes(voter_token);
+        CREATE INDEX IF NOT EXISTS idx_community_project ON community_votes(project_id);
         """)
 
 if __name__ == "__main__":
