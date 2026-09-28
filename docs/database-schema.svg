@@ -1,0 +1,309 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" width="100%" height="auto">
+  <defs>
+    <linearGradient id="schemaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0d13" />
+      <stop offset="50%" stop-color="#121722" />
+      <stop offset="100%" stop-color="#0b0e15" />
+    </linearGradient>
+    <linearGradient id="tblHeaderEvent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1f6feb" />
+      <stop offset="100%" stop-color="#388bfd" />
+    </linearGradient>
+    <linearGradient id="tblHeaderUser" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#238636" />
+      <stop offset="100%" stop-color="#2ea043" />
+    </linearGradient>
+    <linearGradient id="tblHeaderProject" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8957e5" />
+      <stop offset="100%" stop-color="#a371f7" />
+    </linearGradient>
+    <linearGradient id="tblHeaderScore" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9e6a03" />
+      <stop offset="100%" stop-color="#d29922" />
+    </linearGradient>
+    <linearGradient id="tblBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c2128" />
+      <stop offset="100%" stop-color="#161b22" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="720" rx="16" fill="url(#schemaBg)" stroke="#30363d" stroke-width="1.5" />
+
+  <!-- Header -->
+  <g transform="translate(60, 38)">
+    <text x="0" y="0" fill="#f0f6fc" font-family="Georgia, serif" font-size="24" font-weight="bold">
+      DOGFOOD 2026 — SQLite Relational Data Architecture
+    </text>
+    <text x="0" y="22" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12.5">
+      WAL Engine Schema with B-Tree Compound Indexes, Foreign Key Constraints, and Duplicate-Proof Anti-Sybil Bounds
+    </text>
+  </g>
+
+  <!-- ================= COLUMN 1: EVENT, TRACKS, USERS ================= -->
+  <!-- Table: events -->
+  <g transform="translate(60, 85)">
+    <rect width="250" height="135" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderEvent)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">events</text>
+    <text x="180" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[Event Core]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="20" fill="#c9d1d9" font-family="monospace" font-size="10">  name</text>
+      <text x="85" y="20" fill="#8b949e" font-family="monospace" font-size="10">TEXT NOT NULL</text>
+      
+      <text x="0" y="40" fill="#79c0ff" font-family="monospace" font-size="10">  sub_close</text>
+      <text x="85" y="40" fill="#8b949e" font-family="monospace" font-size="10">TEXT (ISO-8601)</text>
+      
+      <text x="0" y="60" fill="#8b949e" font-family="monospace" font-size="10">  created_at</text>
+      <text x="85" y="60" fill="#8b949e" font-family="monospace" font-size="10">TEXT DEFAULT utc</text>
+    </g>
+  </g>
+
+  <!-- Table: tracks -->
+  <g transform="translate(60, 240)">
+    <rect width="250" height="135" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderEvent)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">tracks</text>
+    <text x="175" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[8 Tracks]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="20" fill="#c9d1d9" font-family="monospace" font-size="10">  name</text>
+      <text x="85" y="20" fill="#8b949e" font-family="monospace" font-size="10">TEXT NOT NULL</text>
+      
+      <text x="0" y="40" fill="#79c0ff" font-family="monospace" font-size="10">🔗 event_id</text>
+      <text x="85" y="40" fill="#8b949e" font-family="monospace" font-size="10">FK → events.id</text>
+      
+      <text x="0" y="60" fill="#8b949e" font-family="monospace" font-size="10">  description</text>
+      <text x="85" y="60" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+    </g>
+  </g>
+
+  <!-- Table: judge_tracks -->
+  <g transform="translate(60, 395)">
+    <rect width="250" height="115" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderUser)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">judge_tracks</text>
+    <text x="145" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[N-to-N Mapping]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#79c0ff" font-family="monospace" font-size="10">🔗 judge_id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">FK → users.id</text>
+      
+      <text x="0" y="20" fill="#79c0ff" font-family="monospace" font-size="10">🔗 track_id</text>
+      <text x="85" y="20" fill="#8b949e" font-family="monospace" font-size="10">FK → tracks.id</text>
+      
+      <text x="0" y="42" fill="#58a6ff" font-family="monospace" font-size="9.5">⚡ PK(judge_id, track_id)</text>
+    </g>
+  </g>
+
+  <!-- Table: users -->
+  <g transform="translate(60, 530)">
+    <rect width="250" height="150" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderUser)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">users</text>
+    <text x="145" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[Auth &amp; RBAC]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="18" fill="#c9d1d9" font-family="monospace" font-size="10">  name / email</text>
+      <text x="85" y="18" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+      
+      <text x="0" y="36" fill="#3fb950" font-family="monospace" font-size="10">  role</text>
+      <text x="85" y="36" fill="#8b949e" font-family="monospace" font-size="10">'judge'|'org'|'part'</text>
+      
+      <text x="0" y="54" fill="#58a6ff" font-family="monospace" font-size="10">⚡ session_token</text>
+      <text x="85" y="54" fill="#8b949e" font-family="monospace" font-size="10">TEXT (Indexed)</text>
+      
+      <text x="0" y="72" fill="#8b949e" font-family="monospace" font-size="10">  created_at</text>
+      <text x="85" y="72" fill="#8b949e" font-family="monospace" font-size="10">TEXT DEFAULT utc</text>
+    </g>
+  </g>
+
+  <!-- ================= COLUMN 2: TEAMS & PROJECTS ================= -->
+  <!-- Table: teams -->
+  <g transform="translate(350, 85)">
+    <rect width="250" height="115" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderProject)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">teams</text>
+    <text x="160" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[40 Teams]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="20" fill="#c9d1d9" font-family="monospace" font-size="10">  name</text>
+      <text x="85" y="20" fill="#8b949e" font-family="monospace" font-size="10">TEXT NOT NULL</text>
+      
+      <text x="0" y="40" fill="#8b949e" font-family="monospace" font-size="10">  created_at</text>
+      <text x="85" y="40" fill="#8b949e" font-family="monospace" font-size="10">TEXT DEFAULT utc</text>
+    </g>
+  </g>
+
+  <!-- Table: team_members -->
+  <g transform="translate(350, 220)">
+    <rect width="250" height="100" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderProject)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">team_members</text>
+    <text x="145" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[Participants]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#79c0ff" font-family="monospace" font-size="10">🔗 team_id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">FK → teams.id</text>
+      
+      <text x="0" y="20" fill="#c9d1d9" font-family="monospace" font-size="10">  email</text>
+      <text x="85" y="20" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+    </g>
+  </g>
+
+  <!-- Table: projects -->
+  <g transform="translate(350, 340)">
+    <rect width="250" height="205" rx="8" fill="url(#tblBody)" stroke="#388bfd" stroke-width="1.2" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 28 L 0 28 Z" fill="url(#tblHeaderProject)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">projects</text>
+    <text x="145" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[41 Submissions]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="85" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="18" fill="#79c0ff" font-family="monospace" font-size="10">🔗 team_id</text>
+      <text x="85" y="18" fill="#8b949e" font-family="monospace" font-size="10">FK → teams.id</text>
+      
+      <text x="0" y="36" fill="#79c0ff" font-family="monospace" font-size="10">🔗 track_id</text>
+      <text x="85" y="36" fill="#8b949e" font-family="monospace" font-size="10">FK → tracks.id</text>
+      
+      <text x="0" y="54" fill="#c9d1d9" font-family="monospace" font-size="10">  title</text>
+      <text x="85" y="54" fill="#8b949e" font-family="monospace" font-size="10">TEXT NOT NULL</text>
+      
+      <text x="0" y="72" fill="#8b949e" font-family="monospace" font-size="10">  summary</text>
+      <text x="85" y="72" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+      
+      <text x="0" y="90" fill="#8b949e" font-family="monospace" font-size="10">  repo_url</text>
+      <text x="85" y="90" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+      
+      <text x="0" y="108" fill="#8b949e" font-family="monospace" font-size="10">  submitted_at</text>
+      <text x="85" y="108" fill="#8b949e" font-family="monospace" font-size="10">TEXT (Indexed)</text>
+      
+      <text x="0" y="128" fill="#58a6ff" font-family="monospace" font-size="9.5">⚡ idx_projects_track</text>
+    </g>
+  </g>
+
+  <!-- ================= COLUMN 3: SCORING, RUBRICS, AUDIT ================= -->
+  <!-- Table: scores -->
+  <g transform="translate(640, 85)">
+    <rect width="255" height="235" rx="8" fill="url(#tblBody)" stroke="#e3b341" stroke-width="1.2" />
+    <path d="M 0 8 Q 0 0 8 0 L 247 0 Q 255 0 255 8 L 255 28 L 0 28 Z" fill="url(#tblHeaderScore)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">scores</text>
+    <text x="135" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[126 Evaluations]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="95" y="0" fill="#8b949e" font-family="monospace" font-size="10">INTEGER PK AUTO</text>
+      
+      <text x="0" y="18" fill="#79c0ff" font-family="monospace" font-size="10">🔗 judge_id</text>
+      <text x="95" y="18" fill="#8b949e" font-family="monospace" font-size="10">FK → users.id</text>
+      
+      <text x="0" y="36" fill="#79c0ff" font-family="monospace" font-size="10">🔗 project_id</text>
+      <text x="95" y="36" fill="#8b949e" font-family="monospace" font-size="10">FK → projects.id</text>
+      
+      <text x="0" y="54" fill="#e3b341" font-family="monospace" font-size="10">  criteria_json</text>
+      <text x="95" y="54" fill="#8b949e" font-family="monospace" font-size="10">TEXT JSON {F,Q,I}</text>
+      
+      <text x="0" y="72" fill="#8b949e" font-family="monospace" font-size="10">  comment</text>
+      <text x="95" y="72" fill="#8b949e" font-family="monospace" font-size="10">TEXT</text>
+      
+      <text x="0" y="90" fill="#8b949e" font-family="monospace" font-size="10">  created_at</text>
+      <text x="95" y="90" fill="#8b949e" font-family="monospace" font-size="10">TEXT DEFAULT utc</text>
+      
+      <rect x="0" y="105" width="231" height="42" rx="4" fill="#0d1117" stroke="#e3b341" stroke-width="0.8" />
+      <text x="8" y="121" fill="#f2cc60" font-family="monospace" font-size="9" font-weight="bold">⚡ UNIQUE(judge_id, project_id)</text>
+      <text x="8" y="136" fill="#79c0ff" font-family="monospace" font-size="9">⚡ idx_scores_proj_judge</text>
+    </g>
+  </g>
+
+  <!-- Table: rubric_weights -->
+  <g transform="translate(640, 340)">
+    <rect width="255" height="120" rx="8" fill="url(#tblBody)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 247 0 Q 255 0 255 8 L 255 28 L 0 28 Z" fill="url(#tblHeaderScore)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">rubric_weights</text>
+    <text x="145" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[Criterion Config]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 criterion</text>
+      <text x="95" y="0" fill="#8b949e" font-family="monospace" font-size="10">TEXT PRIMARY KEY</text>
+      
+      <text x="0" y="20" fill="#c9d1d9" font-family="monospace" font-size="10">  weight</text>
+      <text x="95" y="20" fill="#8b949e" font-family="monospace" font-size="10">REAL NOT NULL</text>
+      
+      <text x="0" y="42" fill="#8b949e" font-family="monospace" font-size="9.5">Func: 0.40 · Qual: 0.35 · Innov: 0.25</text>
+    </g>
+  </g>
+
+  <!-- Table: community_votes -->
+  <g transform="translate(640, 480)">
+    <rect width="255" height="150" rx="8" fill="url(#tblBody)" stroke="#3fb950" stroke-width="1.2" />
+    <path d="M 0 8 Q 0 0 8 0 L 247 0 Q 255 0 255 8 L 255 28 L 0 28 Z" fill="url(#tblHeaderUser)" />
+    <text x="12" y="19" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">community_votes</text>
+    <text x="135" y="19" fill="#d0d7de" font-family="monospace" font-size="10">[Anti-Sybil Ballot]</text>
+    
+    <g transform="translate(12, 46)">
+      <text x="0" y="0" fill="#e3b341" font-family="monospace" font-size="10" font-weight="bold">🔑 id</text>
+      <text x="95" y="0" fill="#8b949e" font-family="monospace" font-size="10">INTEGER PK AUTO</text>
+      
+      <text x="0" y="18" fill="#79c0ff" font-family="monospace" font-size="10">🔗 project_id</text>
+      <text x="95" y="18" fill="#8b949e" font-family="monospace" font-size="10">FK → projects.id</text>
+      
+      <text x="0" y="36" fill="#3fb950" font-family="monospace" font-size="10">⚡ voter_token</text>
+      <text x="95" y="36" fill="#8b949e" font-family="monospace" font-size="10">UNIQUE NOT NULL</text>
+      
+      <text x="0" y="54" fill="#8b949e" font-family="monospace" font-size="10">  ip_hash</text>
+      <text x="95" y="54" fill="#8b949e" font-family="monospace" font-size="10">TEXT (Fingerprint)</text>
+      
+      <text x="0" y="74" fill="#3fb950" font-family="monospace" font-size="9.5">⚡ Duplicate attempt → HTTP 409</text>
+    </g>
+  </g>
+
+  <!-- ================= COLUMN 4: WAL ENGINE & PERFORMANCE TELEMETRY ================= -->
+  <g transform="translate(925, 85)">
+    <rect width="215" height="545" rx="10" fill="#161b22" stroke="#388bfd" stroke-width="1.2" />
+    <path d="M 0 10 Q 0 0 10 0 L 205 0 Q 215 0 215 10 L 215 32 L 0 32 Z" fill="#21262d" />
+    <text x="14" y="21" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">SQLITE WAL ENGINE</text>
+    
+    <g transform="translate(14, 48)">
+      <text x="0" y="0" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">Concurrency Architecture:</text>
+      
+      <rect x="0" y="12" width="187" height="60" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="8" y="28" fill="#3fb950" font-family="monospace" font-size="10">PRAGMA journal_mode = WAL;</text>
+      <text x="8" y="44" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="9.5">Non-blocking readers during concurrent score writes.</text>
+      
+      <rect x="0" y="82" width="187" height="60" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="8" y="98" fill="#79c0ff" font-family="monospace" font-size="10">PRAGMA synchronous = NORMAL;</text>
+      <text x="8" y="114" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="9.5">Avoids fsync penalties on local SSDs.</text>
+
+      <rect x="0" y="152" width="187" height="60" rx="6" fill="#0d1117" stroke="#30363d" />
+      <text x="8" y="168" fill="#e3b341" font-family="monospace" font-size="10">PRAGMA cache_size = -64000;</text>
+      <text x="8" y="184" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="9.5">64 MB RAM cache keeping hot data in memory.</text>
+
+      <text x="0" y="235" fill="#c9d1d9" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="bold">Compound Index Footprint:</text>
+      <text x="0" y="254" fill="#8b949e" font-family="monospace" font-size="9.5">• idx_scores_proj_judge</text>
+      <text x="0" y="270" fill="#8b949e" font-family="monospace" font-size="9.5">• idx_scores_judge</text>
+      <text x="0" y="286" fill="#8b949e" font-family="monospace" font-size="9.5">• idx_projects_track</text>
+      <text x="0" y="302" fill="#8b949e" font-family="monospace" font-size="9.5">• idx_users_token</text>
+      <text x="0" y="318" fill="#8b949e" font-family="monospace" font-size="9.5">• idx_community_votes_voter</text>
+
+      <rect x="0" y="340" width="187" height="70" rx="6" fill="#238636" fill-opacity="0.15" stroke="#238636" stroke-width="0.8" />
+      <text x="8" y="358" fill="#3fb950" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="bold">BENCHMARK EXECUTION:</text>
+      <text x="8" y="378" fill="#ffffff" font-family="Georgia, serif" font-size="18" font-weight="bold">6.5 ms</text>
+      <text x="8" y="396" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="9.5">Full 126-score Bayesian audit</text>
+    </g>
+  </g>
+</svg>

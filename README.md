@@ -2,6 +2,10 @@
   <img src="./docs/banner.svg" alt="DOGFOOD 2026 Platform Banner" width="100%">
 </p>
 
+<p align="center">
+  <img src="./docs/badges.svg" alt="DOGFOOD 2026 Live Status Ribbon" width="100%">
+</p>
+
 # DOGFOOD 2026 — Submission & Judging Platform
 > *"Build the platform that will judge you."*
 
@@ -92,6 +96,10 @@ Once running, explore the auto-generated OpenAPI specification:
    - Bayesian shrinkage ($K = 1.0$) to smooth projects with sparse review counts.
    - Full mathematical proof and formulas documented in [`JUDGING.md`](file:///c:/Users/heman/Desktop/dogfood/JUDGING.md).
 
+<p align="center">
+  <img src="./docs/judging-pipeline.svg" alt="Mathematical Normalization Pipeline" width="100%">
+</p>
+
 5. **Judge Scoring Workspace with AI Rubric Co-Pilot (`/judge`):**
    - Real-time evaluation progress bar tracking completed vs. assigned reviews.
    - Interactive scoring modal with dual sliders for Functionality (40%), Technical Quality (35%), and Innovation (25%).
@@ -112,6 +120,10 @@ Once running, explore the auto-generated OpenAPI specification:
 8. **Cryptographic Score Audit Trail (`/audit` & `/api/audit/verify`):**
    - Deterministic SHA-256 Merkle chain linking every evaluation record.
    - Mathematically proves zero post-deadline score tampering; anyone can verify the hash chain in real-time.
+
+<p align="center">
+  <img src="./docs/audit-trail.svg" alt="Cryptographic Merkle Audit Trail" width="100%">
+</p>
 
 9. **Interactive Project Deep-Dive & Duplicate-Proof Community Ballot:**
    - Clicking any project opens the architectural dossier modal with team contributor lists and problem statement.

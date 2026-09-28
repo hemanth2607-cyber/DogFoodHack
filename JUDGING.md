@@ -11,6 +11,10 @@ In any competitive hackathon, three fundamental mathematical biases distort raw 
 2. **Unequal Review Counts & Small-Sample Variance:** Projects with 2 reviews exhibit higher random variance than projects with 5 reviews.
 3. **Fixture Edge Cases (Zero-Variance Judges):** A judge who awards every project identical scores (zero variance, $\sigma_j = 0$). Standard Z-score calculations divide by zero ($\frac{s - \mu}{0}$) and crash naive implementations.
 
+<p align="center">
+  <img src="./docs/normalization-comparison.svg" alt="Naive Averaging vs Bayesian Z-Score Normalization" width="100%">
+</p>
+
 ---
 
 ## 2. Our Multi-Layer Normalization Pipeline

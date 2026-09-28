@@ -1,5 +1,9 @@
 # Security & Threat Model — DOGFOOD 2026
 
+<p align="center">
+  <img src="./docs/security-matrix.svg" alt="DOGFOOD 2026 Security Isolation & Threat Mitigation Matrix" width="100%">
+</p>
+
 ## 1. Overview & Security Philosophy
 
 The DOGFOOD platform is designed as an **offline-first, self-hostable hackathon engine**. Because hackathon judging determines prize allocations and project reputations, the core security objective is **Judging Integrity & Strict Data Isolation**.

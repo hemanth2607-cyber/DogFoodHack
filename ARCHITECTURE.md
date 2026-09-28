@@ -88,6 +88,10 @@ The platform is designed around four foundational architectural tenets:
 
 ## 3. End-to-End Request Pipeline & Security Isolation
 
+<p align="center">
+  <img src="./docs/security-matrix.svg" alt="DOGFOOD 2026 Security Isolation & Role Access Matrix" width="100%">
+</p>
+
 Every inbound HTTP request traverses an explicit authorization and validation pipeline:
 
 ```text
@@ -125,6 +129,10 @@ Every inbound HTTP request traverses an explicit authorization and validation pi
 
 ## 4. High-Performance SQLite Subsystem
 
+<p align="center">
+  <img src="./docs/database-schema.svg" alt="SQLite Relational Schema ERD & WAL Architecture" width="100%">
+</p>
+
 The data persistence layer is engineered specifically for high concurrent throughput during active hackathon evaluation:
 
 ### Optimization Pragma Strategy
@@ -144,6 +152,10 @@ The data persistence layer is engineered specifically for high concurrent throug
 ---
 
 ## 5. Cryptographic Score Provenance Architecture
+
+<p align="center">
+  <img src="./docs/audit-trail.svg" alt="Cryptographic SHA-256 Merkle Provenance Chain" width="100%">
+</p>
 
 To satisfy verifiable judge records and eliminate accusations of post-deadline score tampering, the platform maintains a deterministic Merkle SHA-256 block chain:
 

@@ -1,5 +1,9 @@
 # DATA-MODEL.md — Schema & Data Flow
 
+<p align="center">
+  <img src="./docs/database-schema.svg" alt="DOGFOOD 2026 Relational Data Architecture" width="100%">
+</p>
+
 ## 1. Relational Entity Schema
 
 The data model maps directly from [`fixtures.json`](file:///c:/Users/heman/Desktop/dogfood/fixtures.json) into a clean, relational SQLite database:

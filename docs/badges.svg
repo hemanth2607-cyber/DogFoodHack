@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 68" width="100%" height="auto">
+  <defs>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c2128" />
+      <stop offset="100%" stop-color="#12161c" />
+    </linearGradient>
+    <linearGradient id="greenTag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#238636" />
+      <stop offset="100%" stop-color="#2ea043" />
+    </linearGradient>
+    <linearGradient id="goldTag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9e6a03" />
+      <stop offset="100%" stop-color="#bb8009" />
+    </linearGradient>
+    <linearGradient id="blueTag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1f6feb" />
+      <stop offset="100%" stop-color="#388bfd" />
+    </linearGradient>
+    <linearGradient id="purpleTag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8957e5" />
+      <stop offset="100%" stop-color="#a371f7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Container Ribbon -->
+  <rect width="1200" height="68" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.2" />
+
+  <!-- Badge 1: Acceptance Checker -->
+  <g transform="translate(18, 14)">
+    <rect width="215" height="40" rx="8" fill="url(#badgeGrad)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 95 0 L 95 40 L 8 40 Q 0 40 0 32 Z" fill="#21262d" />
+    <text x="12" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.5">ACCEPTANCE</text>
+    <rect x="100" y="8" width="107" height="24" rx="5" fill="url(#greenTag)" />
+    <circle cx="112" cy="20" r="3.5" fill="#ffffff" />
+    <text x="122" y="24.5" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="bold">7/7 PASS (T1+T2)</text>
+  </g>
+
+  <!-- Badge 2: Zero-Cloud Offline -->
+  <g transform="translate(247, 14)">
+    <rect width="215" height="40" rx="8" fill="url(#badgeGrad)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 80 0 L 80 40 L 8 40 Q 0 40 0 32 Z" fill="#21262d" />
+    <text x="12" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.5">RUNTIME</text>
+    <rect x="85" y="8" width="122" height="24" rx="5" fill="url(#blueTag)" />
+    <text x="94" y="24.5" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="bold">100% OFFLINE / ZERO CDN</text>
+  </g>
+
+  <!-- Badge 3: Normalization Engine -->
+  <g transform="translate(476, 14)">
+    <rect width="235" height="40" rx="8" fill="url(#badgeGrad)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 90 0 L 90 40 L 8 40 Q 0 40 0 32 Z" fill="#21262d" />
+    <text x="12" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.5">MATH ENGINE</text>
+    <rect x="95" y="8" width="132" height="24" rx="5" fill="url(#goldTag)" />
+    <text x="104" y="24.5" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="bold">BAYESIAN Z-SCORE (6.5ms)</text>
+  </g>
+
+  <!-- Badge 4: Cryptographic Audit -->
+  <g transform="translate(725, 14)">
+    <rect width="230" height="40" rx="8" fill="url(#badgeGrad)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 85 0 L 85 40 L 8 40 Q 0 40 0 32 Z" fill="#21262d" />
+    <text x="12" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.5">INTEGRITY</text>
+    <rect x="90" y="8" width="132" height="24" rx="5" fill="url(#purpleTag)" />
+    <text x="98" y="24.5" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="bold">SHA-256 MERKLE CHAIN</text>
+  </g>
+
+  <!-- Badge 5: License & Docker -->
+  <g transform="translate(969, 14)">
+    <rect width="213" height="40" rx="8" fill="url(#badgeGrad)" stroke="#30363d" />
+    <path d="M 0 8 Q 0 0 8 0 L 95 0 L 95 40 L 8 40 Q 0 40 0 32 Z" fill="#21262d" />
+    <text x="12" y="24" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.5">DEPLOYMENT</text>
+    <rect x="100" y="8" width="105" height="24" rx="5" fill="#30363d" />
+    <text x="108" y="24.5" fill="#58a6ff" font-family="monospace" font-size="10.5" font-weight="bold">docker compose</text>
+  </g>
+</svg>
