@@ -3,7 +3,17 @@ import os
 from contextlib import contextmanager
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.environ.get("DOGFOOD_DB_PATH", os.path.join(BASE_DIR, "dogfood.db"))
+
+if os.environ.get("VERCEL"):
+    import shutil
+    db_source = os.path.join(BASE_DIR, "dogfood.db")
+    tmp_db = "/tmp/dogfood.db"
+    if os.path.exists(db_source) and not os.path.exists(tmp_db):
+        shutil.copyfile(db_source, tmp_db)
+    DB_PATH = tmp_db
+else:
+    DB_PATH = os.environ.get("DOGFOOD_DB_PATH", os.path.join(BASE_DIR, "dogfood.db"))
+
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH, timeout=20.0)
