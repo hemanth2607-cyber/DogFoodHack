@@ -66,10 +66,26 @@ To inspect the mathematical normalization engine and judge severity profiling di
 python src/normalization.py
 ```
 
-### Interactive API Documentation
+### Interactive API Documentation & REST Surface
 Once running, explore the auto-generated OpenAPI specification:
 * **Swagger UI:** [http://localhost:8080/docs](http://localhost:8080/docs)
 * **ReDoc:** [http://localhost:8080/redoc](http://localhost:8080/redoc)
+* **OpenAPI Schema:** [http://localhost:8080/openapi.json](http://localhost:8080/openapi.json)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/projects` | JSON array of all 41 projects with track/team metadata | Public |
+| `GET` | `/api/projects/{id}` | Detailed project metadata and community ballot tally | Public |
+| `GET` | `/api/tracks` | JSON array of the 8 competition tracks | Public |
+| `GET` | `/api/event` | Event status, title, and deadline metadata | Public |
+| `GET` | `/api/judge/scores` | Evaluator's assigned scoring ballot | Judge / Organizer |
+| `POST` | `/api/judge/scores` | Submit/update criteria scoring | Judge Only |
+| `GET` | `/api/judge/ai-suggest`| Offline AI Rubric Co-Pilot suggestions | Judge Only |
+| `POST` | `/api/organizer/rubric`| Dynamic criterion weight rebalancing | Organizer Only |
+| `GET` | `/api/export.csv` | Official CSV standings & normalized export | Organizer Only |
+| `GET` | `/api/audit/verify` | Real-time Merkle SHA-256 chain verification | Public |
+| `POST` | `/api/community/vote` | Duplicate-proof community voting | Public (1-vote limit) |
+
 
 ---
 
@@ -154,3 +170,17 @@ The platform uses lightweight cookie-based session headers with an interactive g
 - **[AI Workflow Transparency](file:///c:/Users/heman/Desktop/dogfood/AI-WORKFLOW.md)**: Human-AI collaboration narrative detailing the use of Antigravity, AI Studio, Claude, and Stitch.
 - **[Third-Party Notices & SBOM](file:///c:/Users/heman/Desktop/dogfood/THIRD-PARTY-NOTICES.md)**: Complete dependency manifest and license disclosures.
 - **[License](file:///c:/Users/heman/Desktop/dogfood/LICENSE)**: Standard MIT License.
+
+---
+
+## 🎬 Demo Video & Platform Walkthrough
+
+An animated walkthrough of the complete end-to-end platform audit (including gallery search, persona switching, judge scoring enclave, AI rubric co-pilot, organizer command center, and cryptographic Merkle verification) is provided in [`docs/demo-walkthrough.webp`](file:///c:/Users/heman/Desktop/dogfood/docs/demo-walkthrough.webp):
+
+<p align="center">
+  <img src="./docs/demo-walkthrough.webp" alt="DOGFOOD 2026 End-to-End Walkthrough" width="100%">
+</p>
+
+> **Submission Video Link:** For video evaluation portals requiring an external URL (YouTube / Loom / Google Drive), enter your hosted video link here:  
+> `https://youtu.be/your-demo-id` *(or inspect the self-contained local recording above)*
+

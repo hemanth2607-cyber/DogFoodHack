@@ -596,6 +596,80 @@ def export_csv(current_user: AuthUser = Depends(require_organizer)):
         headers={"Content-Disposition": "attachment; filename=dogfood_results.csv"}
     )
 
+# --- REST API: EVENT, TRACKS & PROJECTS (API-First Architecture) ---
+@app.get("/api/event")
+def get_event_api():
+    """
+    REST API: Returns hackathon event status and deadline metadata.
+    """
+    with get_db() as conn:
+        evt = conn.execute("SELECT id, name, submissions_close FROM events LIMIT 1").fetchone()
+        if not evt:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        try:
+            close_dt = datetime.fromisoformat(evt["submissions_close"].replace("Z", "+00:00"))
+            is_closed = datetime.now(timezone.utc) > close_dt
+        except Exception:
+            is_closed = True
+
+        return {
+            "id": evt["id"],
+            "name": evt["name"],
+            "submissions_close": evt["submissions_close"],
+            "is_closed": is_closed
+        }
+
+@app.get("/api/tracks")
+def list_tracks_api():
+    """
+    REST API: Returns all evaluation tracks.
+    """
+    with get_db() as conn:
+        rows = conn.execute("SELECT id, name, event_id FROM tracks ORDER BY name").fetchall()
+        return [{"id": r["id"], "name": r["name"], "event_id": r["event_id"]} for r in rows]
+
+@app.get("/api/projects")
+def list_projects_api(track: Optional[str] = None, q: Optional[str] = None):
+    """
+    REST API: Returns list of all submitted projects with metadata.
+    Supports filtering by track ID and search query.
+    """
+    with get_db() as conn:
+        sql = """
+            SELECT p.id, p.title, p.summary, p.repo_url, p.submitted_at, p.track_id, 
+                   t.name as track_name, tm.name as team_name
+            FROM projects p
+            JOIN tracks t ON p.track_id = t.id
+            LEFT JOIN teams tm ON p.team_id = tm.id
+            WHERE p.is_draft = 0
+        """
+        params = []
+        if track:
+            sql += " AND p.track_id = ?"
+            params.append(track)
+        if q:
+            sql += " AND (p.title LIKE ? OR tm.name LIKE ?)"
+            params.append(f"%{q}%")
+            params.append(f"%{q}%")
+            
+        sql += " ORDER BY p.submitted_at DESC"
+        rows = conn.execute(sql, params).fetchall()
+        
+        return [
+            {
+                "id": r["id"],
+                "title": r["title"],
+                "summary": r["summary"],
+                "repo_url": r["repo_url"],
+                "track_id": r["track_id"],
+                "track_name": r["track_name"],
+                "team_name": r["team_name"],
+                "submitted_at": r["submitted_at"]
+            }
+            for r in rows
+        ]
+
 # --- ENHANCEMENT 1: PROJECT DETAILS & METADATA ---
 @app.get("/api/projects/{project_id}")
 def get_project_details(project_id: str):

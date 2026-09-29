@@ -152,3 +152,26 @@ def test_precision_metrics_and_tie_breaking():
         assert "track_rank" in r
         assert r["ci_lower"] <= r["normalized_score"] <= r["ci_upper"]
 
+def test_rest_api_projects_and_tracks():
+    # 1. Projects API
+    res_prj = client.get("/api/projects")
+    assert res_prj.status_code == 200
+    prjs = res_prj.json()
+    assert len(prjs) == 41
+    sample = prjs[0]
+    assert "id" in sample and "title" in sample and "track_name" in sample
+
+    # 2. Tracks API
+    res_trk = client.get("/api/tracks")
+    assert res_trk.status_code == 200
+    trks = res_trk.json()
+    assert len(trks) == 8
+
+    # 3. Event API
+    res_evt = client.get("/api/event")
+    assert res_evt.status_code == 200
+    evt = res_evt.json()
+    assert "submissions_close" in evt
+    assert evt["is_closed"] is True
+
+
