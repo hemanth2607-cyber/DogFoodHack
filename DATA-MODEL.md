@@ -8,39 +8,20 @@
 
 The data model maps directly from [`fixtures.json`](file:///c:/Users/heman/Desktop/dogfood/fixtures.json) into a clean, relational SQLite database:
 
-```text
-  ┌──────────────┐         ┌──────────────┐
-  │    events    │         │    tracks    │
-  ├──────────────┤         ├──────────────┤
-  │ id (PK)      │1       *│ id (PK)      │
-  │ name         ├─────────┤ name         │
-  │ sub_close    │         │ event_id     │
-  └──────────────┘         └──────┬───────┘
-                                  │ 1
-                                  │ *
-  ┌──────────────┐ 1     * ┌──────┴───────┐
-  │    teams     ├─────────┤   projects   │
-  ├──────────────┤         ├──────────────┤
-  │ id (PK)      │         │ id (PK)      │
-  │ name         │         │ team_id (FK) │
-  └──────────────┘         │ track_id(FK) │
-                           │ title        │
-                           │ summary      │
-                           │ repo_url     │
-                           │ submitted_at │
-                           └──────┬───────┘
-                                  │ 1
-                                  │ *
-  ┌──────────────┐ 1     * ┌──────┴───────┐
-  │    users     ├─────────┤    scores    │
-  ├──────────────┤         ├──────────────┤
-  │ id (PK)      │         │ id (PK)      │
-  │ name         │         │ judge_id(FK) │
-  │ email        │         │ project_idFK │
-  │ role         │         │ criteria_json│
-  │ session_token│         │ comment      │
-  └──────────────┘         └──────────────┘
-```
+The relational model maps the [`fixtures.json`](fixtures.json) dataset directly into a high-performance SQLite database:
+
+| Table | Purpose | Primary Key | Foreign Keys & Constraints |
+| :--- | :--- | :--- | :--- |
+| **`events`** | Event metadata & cutoff date | `id` (e.g. `evt_01`) | `submissions_close` (ISO-8601 UTC) |
+| **`tracks`** | 8 competition categories | `id` (e.g. `trk_01`) | `event_id` $\to$ `events.id` |
+| **`judge_tracks`** | N-to-N track assignment mapping | `(judge_id, track_id)` | `judge_id` $\to$ `users.id`, `track_id` $\to$ `tracks.id` |
+| **`users`** | Authentication & RBAC roles | `id` (e.g. `jdg_01`) | Indexed `session_token` (`jdg_a_91bc`, etc.) |
+| **`teams`** | 40 participating squads | `id` (e.g. `tm_01`) | `name` |
+| **`team_members`** | Squad participant email roster | Composite | `team_id` $\to$ `teams.id` |
+| **`projects`** | 41 fixture project submissions | `id` (e.g. `prj_01`) | `team_id` $\to$ `teams.id`, `track_id` $\to$ `tracks.id` |
+| **`scores`** | 126 evaluation records | `id` (Autoincrement) | `UNIQUE(judge_id, project_id)`, criteria JSON |
+| **`rubric_weights`** | Organizer weighting configuration| `criterion` | Functionality (0.40), Quality (0.35), Innovation (0.25) |
+| **`community_votes`**| Duplicate-proof anti-Sybil ballot| `id` (Autoincrement) | `UNIQUE(voter_token)`, IP hash fingerprint |
 
 ---
 

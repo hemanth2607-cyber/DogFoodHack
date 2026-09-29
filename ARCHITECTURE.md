@@ -25,64 +25,28 @@ The platform is designed around four foundational architectural tenets:
   <img src="./docs/system-architecture.svg" alt="DOGFOOD 2026 End-to-End System Architecture" width="100%">
 </p>
 
-```text
- ┌────────────────────────────────────────────────────────────────────────────────────────┐
- │                              PRESENTATION & CLIENT LAYER                               │
- │                                                                                        │
- │  • Public Gallery (`/projects`)              • Private Judge Scoring Enclave (`/judge`)│
- │  • Organizer Command Telemetry (`/organizer`) • Merkle Cryptographic Audit (`/audit`)   │
- │  • Interactive OpenAPI Spec (`/docs`)        • Persona Quick-Switch Drawer             │
- │  • Native System CSS & Inline SVGs (Zero CDN)• Vanilla JavaScript (No External Scripts)│
- └───────────────────────────────────────────┬────────────────────────────────────────────┘
-                                             │ HTTP Requests (Port 8080)
-                                             ▼
- ┌────────────────────────────────────────────────────────────────────────────────────────┐
- │                               APPLICATION CONTROLLER LAYER                             │
- │                                                                                        │
- │   FastAPI Core Engine (Asynchronous Request Lifecycle & Lifespan Management)           │
- │   ┌───────────────────────────┐ ┌───────────────────────────┐ ┌────────────────────┐   │
- │   │  RBAC Session Extractor   │ │   Deadline Enforcer       │ │ Peer Score Shield  │   │
- │   │  • Parses session cookie  │ │   • Checks event close    │ │ • Rejects peer     │   │
- │   │  • Validates user role    │ │   • Atomic 403 rejection  │ │   access with 403  │   │
- │   └─────────────┬─────────────┘ └─────────────┬─────────────┘ └─────────┬──────────┘   │
- └─────────────────┼─────────────────────────────┼─────────────────────────┼──────────────┘
-                   │                             │                         │
-                   ▼                             ▼                         ▼
- ┌────────────────────────────────────────────────────────────────────────────────────────┐
- │                                  DOMAIN SERVICES LAYER                                 │
- │                                                                                        │
- │  ┌─────────────────────────────────────────┐  ┌─────────────────────────────────────┐  │
- │  │      Z-Score Normalization Engine       │  │    Cryptographic Provenance Engine  │  │
- │  │  • Rubric weight aggregation            │  │  • SHA-256 Merkle Block Chain       │  │
- │  │  • Evaluator severity delta (Δj)        │  │  • Tamper-evident linking (126 blks)│  │
- │  │  • Zero-variance safeguard (σ < 10⁻⁵)   │  │  • Zero-Knowledge privacy masking   │  │
- │  │  • Empirical Bayes shrinkage (K = 1.0)  │  │    for public peer isolation        │  │
- │  │  • 95% Confidence Interval bounds       │  └─────────────────────────────────────┘  │
- │  │  • Deterministic 5-tier tie-breaking    │  ┌─────────────────────────────────────┐  │
- │  └─────────────────────────────────────────┘  │      Anti-Cheat Voting Service      │  │
- │                                               │  • Client fingerprinting (IP+UA)    │  │
- │                                               │  • Strict 1-vote-per-voter limit    │  │
- │                                               └─────────────────────────────────────┘  │
- └───────────────────────────────────────────┬────────────────────────────────────────────┘
-                                             │ Connection Pool (WAL Mode)
-                                             ▼
- ┌────────────────────────────────────────────────────────────────────────────────────────┐
- │                                DATA PERSISTENCE LAYER                                  │
- │                                                                                        │
- │   Embedded SQLite 3 Relational Database (`dogfood.db`)                                 │
- │   • PRAGMA journal_mode = WAL; (Concurrent non-blocking reads & writes)                │
- │   • PRAGMA synchronous = NORMAL; (Eliminates fsync disk bottlenecks)                   │
- │   • PRAGMA cache_size = -64000; (64 MB In-Memory Page Cache)                           │
- │   • PRAGMA temp_store = MEMORY; (Instant in-memory index evaluation)                   │
- │                                                                                        │
- │   Relational Tables & Constraints:                                                     │
- │   • events (submissions_close)          • users (role, session_token)                  │
- │   • tracks (id, name, event_id)         • judge_tracks (judge_id, track_id)            │
- │   • teams (id, name)                    • team_members (team_id, email)                │
- │   • projects (team_id, track_id)        • scores [UNIQUE(judge_id, project_id)]        │
- │   • rubric_weights (criterion, weight)  • community_votes [UNIQUE(voter_token)]        │
- └────────────────────────────────────────────────────────────────────────────────────────┘
-```
+The platform is organized into four decoupled architectural tiers:
+
+1. **Layer 1 — Presentation & Client Runtimes:**
+   - **Public Gallery (`/projects`):** Searchable project showcase with track filtering.
+   - **Judge Scoring Enclave (`/judge`):** Private evaluation workspace with offline AI rubric co-pilot.
+   - **Organizer Command Center (`/organizer`):** Live judge velocity meters, dynamic rubric weighting, and audited CSV export.
+   - **Offline UI Assets:** Vanilla CSS (`static/style.css`) and inline SVG icons with zero CDN or external font dependencies.
+
+2. **Layer 2 — Application Controller Barrier:**
+   - **FastAPI Lifespan Engine:** Asynchronous routing and automated SQLite startup initialization.
+   - **RBAC Session Extractor:** Cookie-based session resolution (`get_current_user`).
+   - **Deadline Enforcer:** Compares UTC submission timestamps against event cutoff; rejects post-deadline submissions with `403 Forbidden`.
+   - **Peer Score Shield:** Prevents evaluators from snooping on peer ballots (`403 Forbidden`).
+
+3. **Layer 3 — Domain Services Layer:**
+   - **Normalization Engine:** Calculates judge-specific means ($\mu_j$) and standard deviations ($\sigma_j$), protects against zero-variance raters, applies Empirical Bayes shrinkage ($K = 1.0$), and computes 95% Confidence Intervals.
+   - **Cryptographic Provenance Engine:** Builds and verifies the 126-record SHA-256 Merkle chain with zero-knowledge privacy masking.
+   - **Anti-Sybil Voting Service:** Strictly limits community voting to 1 vote per voter token with client fingerprinting.
+
+4. **Layer 4 — Data Persistence Layer:**
+   - **Embedded SQLite (`dogfood.db`):** Configured in WAL mode (`PRAGMA journal_mode = WAL`) with `PRAGMA synchronous = NORMAL` and 64 MB in-memory page cache.
+   - **Index Strategy:** 8 compound B-Tree indexes guaranteeing sub-7ms query execution.
 
 ---
 
